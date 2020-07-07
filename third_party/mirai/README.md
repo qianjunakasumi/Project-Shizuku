@@ -1,6 +1,6 @@
 # Mirai 安装指南
 
-##Step 1：下载依赖
+## Step 1：下载依赖
 
 [Download 下载](http://t.imlxy.net:64724/mirai/MiraiOK/miraiOK_windows_amd64.exe) 🎃MiraiOK 安装程序 ![Compile MiraiOK](https://github.com/LXY1226/miraiOK/workflows/Compile%20MiraiOK/badge.svg)
 
