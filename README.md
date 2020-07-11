@@ -4,6 +4,7 @@
 <p align="center">
     <img src="https://img.shields.io/badge/%E4%BA%A7%E5%93%81%E5%90%8D%E7%A7%B0-SHIZUKU%F0%9F%92%A7-brightgreen?style=flat-square" alt="产品名称">
     <img src="https://img.shields.io/badge/%E5%BC%80%E5%8F%91%E5%9B%A2%E9%98%9F-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square" alt="开发团队">
+    <a href="https://goreportcard.com/report/github.com/qianjunakasumi/shizuku"><img src="https://goreportcard.com/badge/github.com/qianjunakasumi/shizuku?style=flat-square" alt="Go Report Card"></a>
     <img src="https://img.shields.io/github/repo-size/qianjunakasumi/shizuku?style=flat-square" alt="repo size">
 </p>
 
@@ -16,6 +17,26 @@ SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL执照 开源
 ## 介绍
 
 SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关于**偶像的新闻、活动、商品**等信息的机器人应用
+
+### 支持的功能
+
+- Twitter
+    - 粉丝数查询
+    - 粉丝数数据日推
+    - 推文查询
+
+### 开发和计划中的功能
+
+- LLAS
+    - 随机卡片
+    - 卡片查询
+    - 抽卡模拟
+
+- 表情
+    - 随机表情
+    - 上传表情
+
+... 更多您期待的功能欢迎您通过“贡献“向我们反馈！
 
 ## 贡献
 
@@ -43,10 +64,22 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 - [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2844d8f57d50a8818bd70e521ca879467ebc47391698ac4216ba14c44a46be56) （推荐）
 - [![邮箱](https://img.shields.io/badge/%E9%82%AE%E7%AE%B1-qianjunakasumi%40gmail.com-brightgreen?style=flat-square)](mailto:qianjunakasumi@gmail.com)
+- [!ssues](https://github.com/qianjunakasumi/shizuku/issues)
 
 ### 鸣谢
 
 <img width="160" src="https://s1.ax1x.com/2020/05/16/YcD4De.png" alt="谢谢">
+
+## 执行标准
+
+- [golang-standards/project-layout](https://github.com/golang-standards/project-layout)
+- [语义化版本 2.0.0](https://semver.org/lang/zh-CN/)
+
+## 依赖
+
+- [project-mirai/mirai-api-http](https://github.com/project-mirai/mirai-api-http) AGPL-3.0 许可
+- [rs/zerolog](https://github.com/rs/zerolog) MIT 许可
+- [json-iterator/go](https://github.com/json-iterator/go) MIT 许可
 
 ## 许可
 
