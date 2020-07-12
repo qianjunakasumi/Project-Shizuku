@@ -73,7 +73,7 @@ func verify() error {
 	return nil
 }
 
-// 释放SessionKey
+// Release 释放SessionKey
 func Release() error {
 	res, err := post("release", Content{
 		"sessionKey": session,
@@ -112,7 +112,7 @@ func listen() error {
 	return nil
 }
 
-// 发送群消息
+// SendGroupMessage 发送群消息
 func SendGroupMessage(target uint32, message *messageChain.MessageChain) error {
 	res, err := post("sendGroupMessage", Content{
 		"sessionKey":   session,
