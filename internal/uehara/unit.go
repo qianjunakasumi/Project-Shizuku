@@ -23,7 +23,7 @@ import (
 	"fmt"
 
 	"github.com/qianjunakasumi/shizuku/configs"
-	. "github.com/qianjunakasumi/shizuku/internal/uehara/messageChain"
+	"github.com/qianjunakasumi/shizuku/internal/uehara/messageChain"
 
 	"golang.org/x/net/websocket"
 )
@@ -35,10 +35,10 @@ var (
 func code(code float64) error {
 	if code == 0 {
 		return nil
-	} else {
-		fmt.Println(code)
-		return errors.New("code不为0")
 	}
+
+	fmt.Println(code)
+	return errors.New("code不为0")
 }
 
 func auth() error {
@@ -73,6 +73,7 @@ func verify() error {
 	return nil
 }
 
+// 释放SessionKey
 func Release() error {
 	res, err := post("release", Content{
 		"sessionKey": session,
@@ -111,7 +112,8 @@ func listen() error {
 	return nil
 }
 
-func SendGroupMessage(target uint32, message *MessageChain) error {
+// 发送群消息
+func SendGroupMessage(target uint32, message *messageChain.MessageChain) error {
 	res, err := post("sendGroupMessage", Content{
 		"sessionKey":   session,
 		"target":       target,
