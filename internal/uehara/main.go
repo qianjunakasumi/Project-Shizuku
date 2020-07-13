@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/qianjunakasumi/shizuku/internal/uehara/messageChain"
+	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
 
 	"github.com/rs/zerolog/log"
 )
@@ -106,18 +106,18 @@ func writeCalls(fields *map[string]string, calls *[]string, action *map[string]i
 func handle(calls *[]string, msg *Message, action *map[string]interface{}) {
 	fields := writeDefaults((*action)["expand"].([]expand))
 	errMsg := writeCalls(&fields, calls, action)
-	var msgChain *messageChain.MessageChain
+	var msgChain *messagechain.MessageChain
 
 	fmt.Println("查询的数据：", fields)
 
 	if errMsg != "" {
-		msgChain = new(messageChain.MessageChain)
+		msgChain = new(messagechain.MessageChain)
 		msgChain.AddText(errMsg)
 	} else {
 		var err error
 
 		// 取出(*actions)的值，定位"func"字段，类型断言为相同的函数类型,取出函数指针的值，执行函数
-		msgChain, err = (*((*action)["func"].(*func(calls map[string]string) (*messageChain.MessageChain, error))))(fields)
+		msgChain, err = (*((*action)["func"].(*func(calls map[string]string) (*messagechain.MessageChain, error))))(fields)
 		if err != nil {
 			msgChain.AddText("\n执行时发生错误，调试信息：" + fmt.Sprintf("%v", err))
 		}
