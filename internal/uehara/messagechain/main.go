@@ -23,7 +23,7 @@ type MessageChain struct {
 	Content []map[string]interface{}
 }
 
-// MessageChain.AddText 插入文本
+// AddText 插入文本
 func (m *MessageChain) AddText(str string) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type": "Plain",
@@ -31,7 +31,7 @@ func (m *MessageChain) AddText(str string) {
 	})
 }
 
-// MessageChain.AddAt 插入提醒
+// AddAt 插入提醒
 func (m *MessageChain) AddAt(target uint32) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type":    "At",
@@ -40,7 +40,7 @@ func (m *MessageChain) AddAt(target uint32) {
 	})
 }
 
-// MessageChain.AddImage 插入图片
+// AddImage 插入图片
 func (m *MessageChain) AddImage(path string) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type": "Image",
