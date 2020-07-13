@@ -23,7 +23,7 @@ import (
 	"fmt"
 
 	"github.com/qianjunakasumi/shizuku/configs"
-	"github.com/qianjunakasumi/shizuku/internal/uehara/messageChain"
+	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
 
 	"golang.org/x/net/websocket"
 )
@@ -113,7 +113,7 @@ func listen() error {
 }
 
 // SendGroupMessage 发送群消息
-func SendGroupMessage(target uint32, message *messageChain.MessageChain) error {
+func SendGroupMessage(target uint32, message *messagechain.MessageChain) error {
 	res, err := post("sendGroupMessage", Content{
 		"sessionKey":   session,
 		"target":       target,
