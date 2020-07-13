@@ -16,12 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package messageChain
+package messagechain
 
+// MessageChain 消息链
 type MessageChain struct {
 	Content []map[string]interface{}
 }
 
+// MessageChain.AddText 插入文本
 func (m *MessageChain) AddText(str string) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type": "Plain",
@@ -29,10 +31,19 @@ func (m *MessageChain) AddText(str string) {
 	})
 }
 
+// MessageChain.AddAt 插入提醒
 func (m *MessageChain) AddAt(target uint32) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type":    "At",
 		"target":  target,
 		"display": "@",
+	})
+}
+
+// MessageChain.AddImage 插入图片
+func (m *MessageChain) AddImage(path string) {
+	m.Content = append(m.Content, map[string]interface{}{
+		"type": "Image",
+		"path": "../../../../../assets/images/" + path,
 	})
 }
