@@ -44,6 +44,6 @@ func (m *MessageChain) AddAt(target uint32) {
 func (m *MessageChain) AddImage(path string) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type": "Image",
-		"path": "../../../../../assets/images/" + path,
+		"path": "../../../../../" + path,
 	})
 }
