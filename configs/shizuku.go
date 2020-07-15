@@ -15,10 +15,40 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package configs
 
-const (
-	QQNumber     = 2103530879
-	MiraiAddress = "127.0.0.1:7958"
-	MiraiAuthKey = "LOVELIVENIJIGASAKISCHOOLIDOL&NIJIGASAKIMIRAINIJI-PRODUCT"
+import (
+	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
+
+type conf struct {
+	QQNumber     uint32 // Robot QQ号
+	MiraiAddress string // Mirai API HTTP URL地址
+	MiraiAuthKey string // Mirai API HTTP AuthKey
+}
+
+var (
+	Conf conf // 配置文件
+
+	Version   = "0.1.0-alpha.1" // 版本
+	BuildTime string            // 编译时的日期和时间
+	CommitId  string            // 存储库最新提交的短SHA1
+)
+
+// SetConfigs 配置配置参数
+func SetConfigs() error {
+	file, err := ioutil.ReadFile("configs/configs.yml")
+	if err != nil {
+		return err
+	}
+
+	err = yaml.Unmarshal(file, &Conf)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
