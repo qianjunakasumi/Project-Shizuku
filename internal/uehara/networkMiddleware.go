@@ -15,13 +15,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package uehara
 
 import (
 	"io/ioutil"
 
 	"github.com/qianjunakasumi/shizuku/configs"
-	. "github.com/qianjunakasumi/shizuku/pkg/networkware"
+	"github.com/qianjunakasumi/shizuku/pkg/networkware"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -30,7 +31,7 @@ var (
 	json = jsoniter.ConfigCompatibleWithStandardLibrary
 )
 
-type Content map[string]interface{}
+type Content map[string]interface{} // Mirai返回内容
 
 func post(address string, content Content) (Content, error) {
 	bytes, err := json.Marshal(&content)
@@ -38,14 +39,13 @@ func post(address string, content Content) (Content, error) {
 		return nil, err
 	}
 
-	req := new(Networkware)
-	req.Address = "http://" + configs.MiraiAddress + "/" + address
+	req := new(networkware.Networkware)
+	req.Address = "http://" + configs.Conf.MiraiAddress + "/" + address
 	req.Body = bytes
 	req.Method = "POST"
 	req.Header = [][]string{
 		{"Content-Type", "application/json; charset=utf-8"},
 	}
-
 	res, err := req.Send()
 	if err != nil {
 		return nil, err
