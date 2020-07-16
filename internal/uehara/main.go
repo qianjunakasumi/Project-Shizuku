@@ -148,6 +148,9 @@ func receive(msg Message) error {
 	}
 
 	calls := strings.Fields(mainMsg["text"].(string))
+	if len(calls) < 1 {
+		return nil
+	}
 
 	for _, v := range actions {
 		for _, v2 := range v["key"].([]string) {
