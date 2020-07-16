@@ -31,8 +31,7 @@ type conf struct {
 }
 
 var (
-	Conf conf // 配置文件
-
+	Conf      conf              // 配置文件
 	Version   = "0.1.0-alpha.1" // 版本
 	BuildTime string            // 编译时的日期和时间
 	CommitId  string            // 存储库最新提交的短SHA1

@@ -31,7 +31,8 @@ var (
 	json = jsoniter.ConfigCompatibleWithStandardLibrary
 )
 
-type Content map[string]interface{} // Mirai返回内容
+// Mirai返回内容
+type Content map[string]interface{}
 
 func post(address string, content Content) (Content, error) {
 	bytes, err := json.Marshal(&content)

@@ -15,6 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package networkware
 
 import (
@@ -24,6 +25,7 @@ import (
 	"net/url"
 )
 
+// Networkware 网络件
 type Networkware struct {
 	Address string
 	Body    []byte
@@ -48,6 +50,7 @@ func (n Networkware) header(req **http.Request) {
 	}
 }
 
+// Send 发送请求
 func (n Networkware) Send() (*http.Response, error) {
 	if n.Address == "" {
 		return nil, errors.New("请求地址为空")

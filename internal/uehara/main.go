@@ -27,6 +27,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Message 消息
 type Message map[string]interface{}
 
 func writeDefaults(expand2 []expand) map[string]string {
@@ -164,6 +165,7 @@ func receive(msg Message) error {
 	return nil
 }
 
+// Connect 连接至Mirai
 func Connect() error {
 	if err := auth(); err != nil {
 		return err
