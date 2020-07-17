@@ -31,7 +31,7 @@ var (
 	json = jsoniter.ConfigCompatibleWithStandardLibrary
 )
 
-// Mirai返回内容
+// Content Mirai返回的内容
 type Content map[string]interface{}
 
 func post(address string, content Content) (Content, error) {

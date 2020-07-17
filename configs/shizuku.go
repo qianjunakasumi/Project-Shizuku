@@ -24,6 +24,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// conf configs.yml结构
 type conf struct {
 	QQNumber     uint32 // Robot QQ号
 	MiraiAddress string // Mirai API HTTP URL地址
