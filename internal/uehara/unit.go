@@ -43,7 +43,7 @@ func code(code float64) error {
 
 func auth() error {
 	res, err := post("auth", Content{
-		"authKey": configs.MiraiAuthKey,
+		"authKey": configs.Conf.MiraiAuthKey,
 	})
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func auth() error {
 func verify() error {
 	res, err := post("verify", Content{
 		"sessionKey": session,
-		"qq":         configs.QQNumber,
+		"qq":         configs.Conf.QQNumber,
 	})
 	if err != nil {
 		return err
@@ -77,7 +77,7 @@ func verify() error {
 func Release() error {
 	res, err := post("release", Content{
 		"sessionKey": session,
-		"qq":         configs.QQNumber,
+		"qq":         configs.Conf.QQNumber,
 	})
 	if err != nil {
 		return err
@@ -91,7 +91,7 @@ func Release() error {
 }
 
 func listen() error {
-	ws, err := websocket.Dial("ws://"+configs.MiraiAddress+"/message?sessionKey="+session, "", "http://localhost/")
+	ws, err := websocket.Dial("ws://"+configs.Conf.MiraiAddress+"/message?sessionKey="+session, "", "http://localhost/")
 	if err != nil {
 		return err
 	}
