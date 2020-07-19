@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/chromedp/cdproto v0.0.0-20200706151146-b7f349b11751 // indirect
 	github.com/chromedp/chromedp v0.5.3
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.0.3 // indirect
 	github.com/json-iterator/go v1.1.10
