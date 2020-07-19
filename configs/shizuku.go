@@ -26,9 +26,11 @@ import (
 
 // conf configs.yml结构
 type conf struct {
-	QQNumber     uint32 // Robot QQ号
-	MiraiAddress string // Mirai API HTTP URL地址
-	MiraiAuthKey string // Mirai API HTTP AuthKey
+	QQNumber         uint32 // Robot QQ号
+	MiraiAddress     string // Mirai API HTTP URL地址
+	MiraiAuthKey     string // Mirai API HTTP AuthKey
+	TranslationAppID string // 百度翻译 APP ID
+	TranslationKey   string // 百度翻译 Key
 }
 
 var (
