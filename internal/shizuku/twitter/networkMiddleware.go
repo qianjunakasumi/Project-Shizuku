@@ -26,10 +26,9 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-var (
-	json = jsoniter.ConfigCompatibleWithStandardLibrary
-)
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
+// Content TwitterAPI内容
 type Content map[string]interface{}
 
 func get(address string) (Content, error) {
