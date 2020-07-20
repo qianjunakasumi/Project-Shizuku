@@ -20,11 +20,11 @@ package uehara
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/qianjunakasumi/shizuku/configs"
 	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
 
+	"github.com/rs/zerolog/log"
 	"golang.org/x/net/websocket"
 )
 
@@ -37,7 +37,9 @@ func code(code float64) error {
 		return nil
 	}
 
-	fmt.Println(code)
+	log.Error().
+		Float64("状态码", code).
+		Msg("发送消息失败")
 	return errors.New("code不为0")
 }
 
@@ -114,6 +116,10 @@ func listen() error {
 
 // SendGroupMessage 发送群消息
 func SendGroupMessage(target uint32, message *messagechain.MessageChain) error {
+	if message.Cancel {
+		return nil
+	}
+
 	res, err := post("sendGroupMessage", Content{
 		"sessionKey":   session,
 		"target":       target,

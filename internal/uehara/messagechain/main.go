@@ -21,6 +21,7 @@ package messagechain
 // MessageChain 消息链
 type MessageChain struct {
 	Content []map[string]interface{}
+	Cancel  bool
 }
 
 // AddText 插入文本
