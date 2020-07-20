@@ -53,7 +53,7 @@ func isExistKey(keys []expand, str string) string {
 }
 
 func isLimit(limit []string, str string) bool {
-	if len(limit) == 0 { //无限制情形
+	if len(limit) == 0 { // 无限制情形
 		return true
 	}
 
@@ -75,7 +75,7 @@ func writeCalls(fields *map[string]string, calls *[]string, action *map[string]i
 			break
 		}
 
-		callSplit := strings.Split((*calls)[i], "：") //以“：”分割字符串，当长度为 2 时则是指定参数方式
+		callSplit := strings.Split((*calls)[i], "：") // 以“：”分割字符串，当长度为 2 时则是指定参数方式
 
 		expand2 := (*action)["expand"].([]expand)
 
@@ -109,7 +109,7 @@ func handle(calls *[]string, msg *Message, action *map[string]interface{}) {
 	errMsg := writeCalls(&fields, calls, action)
 	var msgChain *messagechain.MessageChain
 
-	fmt.Println("查询的数据：", fields)
+	log.Info().Msg("查询详情：" + fmt.Sprintf("%v", fields))
 
 	if errMsg != "" {
 		msgChain = new(messagechain.MessageChain)
@@ -176,9 +176,6 @@ func Connect() error {
 	if err := listen(); err != nil {
 		return err
 	}
-
-	log.Info().
-		Msg("连接至Mirai成功")
 
 	initApp()
 
