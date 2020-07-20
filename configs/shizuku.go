@@ -31,6 +31,7 @@ type conf struct {
 	MiraiAuthKey     string // Mirai API HTTP AuthKey
 	TranslationAppID string // 百度翻译 APP ID
 	TranslationKey   string // 百度翻译 Key
+	Databaseurl      string // 数据库地址
 }
 
 var (
