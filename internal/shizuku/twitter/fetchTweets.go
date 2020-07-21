@@ -19,12 +19,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package twitter
 
 import (
-	"bytes"
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"io/ioutil"
+	"math"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -37,6 +39,7 @@ import (
 	"github.com/qianjunakasumi/shizuku/configs"
 	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
 	"github.com/qianjunakasumi/shizuku/pkg/networkware"
+	"github.com/rs/zerolog/log"
 )
 
 type fetchTwitter struct {
@@ -51,7 +54,11 @@ type fetchTwitter struct {
 	wantTweetTranslationText string                 // 要获取的推文的翻译内容
 }
 
-var FetchTweets = fetchTweet
+var (
+	FetchTweets         = fetchTweet          // 获取推文
+	ScheduleFetchTweets = scheduleFetchTweets // 定时推送
+	conversationId      string                // 推文ID
+)
 
 // 获取推文 | 建立索引
 func (f *fetchTwitter) main(id string) error {
@@ -103,30 +110,28 @@ func (f *fetchTwitter) writeHeader() {
 	// 带评论转推
 	if quoteId, ok := f.wantTweetMap["quoted_status_id_str"].(string); ok {
 		f.wantTweetHeader = "带评论:" + "\n"
-		f.wantTweetAddition = "转推了:\n" + f.tweetsList[quoteId].(map[string]interface{})["full_text"].(string)
+		f.wantTweetAddition = "\n转推了:\n" + f.tweetsList[quoteId].(map[string]interface{})["full_text"].(string)
 	}
 
 	// 回复
 	if replyId, ok := f.wantTweetMap["in_reply_to_status_id_str"].(string); ok {
 		f.wantTweetHeader = "回复了:" + "\n"
-		f.wantTweetText += "给推文:\n" + f.tweetsList[replyId].(map[string]interface{})["full_text"].(string)
+		f.wantTweetText += "\n给推文:\n" + f.tweetsList[replyId].(map[string]interface{})["full_text"].(string)
 	}
 
 }
 
-// 去除后缀链接 | 替换为原始链接 | 去除 http(s)://
-func (f *fetchTwitter) urlHandle() error {
+// 去除后缀链接 | 替换为原始链接 | 去除 http(s):// | 转换HTML转义符
+func (f *fetchTwitter) tidyContent() {
 	tweetURLs, ok := (f.wantTweetMap["entities"].(map[string]interface{}))["urls"].([]interface{})
 	if !ok {
 		// 针对无链接但存在引用例如转推或图片等扩展内容链接下的URL删除
 		reg, err := regexp.Compile(`https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`)
 		if err != nil {
-			return err
+			return
 		}
 		f.wantTweetText = reg.ReplaceAllString(f.wantTweetText, "")
 		f.wantTweetAddition = reg.ReplaceAllString(f.wantTweetAddition, "")
-
-		return nil
 	}
 
 	for i := 0; i < len(tweetURLs); i++ {
@@ -137,21 +142,22 @@ func (f *fetchTwitter) urlHandle() error {
 	reg, err := regexp.Compile(`https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`)
 	reg2, err := regexp.Compile(`https?://`)
 	if err != nil {
-		return err
+		return
 	}
 	f.wantTweetText = reg.ReplaceAllString(f.wantTweetText, "")
 	f.wantTweetAddition = reg.ReplaceAllString(f.wantTweetAddition, "")
 	f.wantTweetText = reg2.ReplaceAllString(f.wantTweetText, "")
 	f.wantTweetAddition = reg2.ReplaceAllString(f.wantTweetAddition, "")
 
-	return nil
+	f.wantTweetText = html.UnescapeString(f.wantTweetText)
+	f.wantTweetAddition = html.UnescapeString(f.wantTweetAddition)
 }
 
 // 下载第一张图片缩略图
-func (f *fetchTwitter) downloadImage() error {
+func (f *fetchTwitter) downloadImage() {
 	tweetMedia, ok := (f.wantTweetMap["entities"].(map[string]interface{}))["media"].([]interface{})
 	if !ok {
-		return nil
+		return
 	}
 
 	address := strings.Builder{}
@@ -159,16 +165,16 @@ func (f *fetchTwitter) downloadImage() error {
 	address.WriteString(time.Now().Format("200601") + "/")
 	address.WriteString(f.wantTweetMap["conversation_id_str"].(string) + "/")
 	path := address.String()
-	address.WriteString(tweetMedia[0].(map[string]interface{})["id_str"].(string) + ".jpg")
+	address.WriteString(tweetMedia[0].(map[string]interface{})["id_str"].(string) + ".webp")
 	path2 := address.String()
-	f.wantTweetImagePath = path2
 	_, err := os.Stat(path)
 	if err == nil {
-		return nil
+		f.wantTweetImagePath = path2
+		return
 	}
 
 	req := new(networkware.Networkware)
-	req.Address = tweetMedia[0].(map[string]interface{})["media_url_https"].(string) + "?format=jpg&name=small" // 缩略图
+	req.Address = tweetMedia[0].(map[string]interface{})["media_url_https"].(string) + "?format=webp&name=small" // 缩略图
 	req.Method = "GET"
 	req.Header = [][]string{
 		{"user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4128.3 Safari/537.36"},
@@ -176,36 +182,49 @@ func (f *fetchTwitter) downloadImage() error {
 	req.Proxy = "http://127.0.0.1:10809"
 	res, err := req.Send()
 	if err != nil {
-		return err
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "downloadImage").
+			Msg("请求图片时出错")
+		return
 	}
 	defer res.Body.Close()
-	cont, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
 
 	err = os.MkdirAll(path, os.ModePerm)
 	if err != nil {
-		return err
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "downloadImage").
+			Msg("创建缓存文件夹时出错")
+		return
 	}
 	file, err := os.Create(path2)
 	if err != nil {
-		return err
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "downloadImage").
+			Msg("创建缓存图片时出错")
+		return
 	}
-	_, err = io.Copy(file, bytes.NewReader(cont))
+	defer file.Close()
+	_, err = io.Copy(file, res.Body)
 	if err != nil {
-		return err
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "downloadImage").
+			Msg("保存缓存图片时出错")
+		return
 	}
 
-	return nil
+	f.wantTweetImagePath = path2
 }
 
 // 翻译推文
-func (f *fetchTwitter) translateTweet() error {
+func (f *fetchTwitter) translateTweet() {
 	content := f.wantTweetText
 	reg, err := regexp.Compile(`[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`)
 	if err != nil {
-		return err
+		return
 	}
 	content = reg.ReplaceAllString(content, "")
 
@@ -218,35 +237,43 @@ func (f *fetchTwitter) translateTweet() error {
 	h := md5.New()
 	_, err = io.WriteString(h, configs.Conf.TranslationAppID+content+"SHIZUKU"+configs.Conf.TranslationKey)
 	if err != nil {
-		return err
+		return
 	}
 	query.Add("sign", fmt.Sprintf("%x", h.Sum(nil)))
 
 	res, err := http.Get("https://api.fanyi.baidu.com/api/trans/vip/translate?" + query.Encode())
 	if err != nil {
-		return err
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "translateTweet").
+			Msg("请求翻译API时出错")
+		return
 	}
 	robots, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		return err
-	}
+	defer res.Body.Close()
 
 	result := make(map[string]interface{})
 	if err := json.Unmarshal(robots, &result); err != nil {
-		return err
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "translateTweet").
+			Msg("解析JSON时出错")
+		return
 	}
 	transList, ok := result["trans_result"].([]interface{})
 	if !ok {
-		return errors.New("解析翻译时出问题")
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "translateTweet").
+			Msg("解析翻译内容时出错")
+		return
 	}
 	for i := 0; i < len(transList); i++ {
 		f.wantTweetTranslationText += transList[i].(map[string]interface{})["dst"].(string) + "\n"
 	}
-
-	return nil
 }
 
+// 写入脚注信息
 func (f *fetchTwitter) writeFooter() {
 	t, _ := time.Parse("Mon Jan 02 15:04:05 +0000 2006", f.wantTweetMap["created_at"].(string))
 	beijing, _ := time.LoadLocation("Local")
@@ -255,12 +282,38 @@ func (f *fetchTwitter) writeFooter() {
 	f.wantTweetFooter = "发送时间：" + t.In(beijing).Format("01月02日 15时04分") + "\n被喜欢次数：" + favoriteCount
 }
 
-func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) {
+func main2(twitter *fetchTwitter, message *messagechain.MessageChain) {
+	twitter.writeHeader()
+	twitter.tidyContent()
+	twitter.downloadImage()
+	twitter.translateTweet()
+	twitter.writeFooter()
+
+	message.AddText(twitter.wantTweetHeader + twitter.wantTweetText + "\n")
+	if twitter.wantTweetImagePath != "" {
+		message.AddImage(twitter.wantTweetImagePath)
+		message.AddText("\n")
+	}
+	if twitter.wantTweetAddition != "" {
+		message.AddText("\n" + twitter.wantTweetAddition + "\n")
+	}
+	message.AddText("\n翻译：\n" + twitter.wantTweetTranslationText + "\n")
+	message.AddText(twitter.wantTweetFooter)
+}
+
+func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
 	m := new(messagechain.MessageChain)
-	profile := getProfile(calls["account"])
+	profile := getProfile(call)
 
-	m.AddText("> " + profile.name + " 的推文：\n")
+	x := float64(time.Now().Hour())
+	y := -0.0047*math.Pow(x, 4) + 0.1544*math.Pow(x, 3) - 1.1701*math.Pow(x, 2) + 2.8274*x + 4.8613
+	r := rand.Intn(100)
+	if r > int(y) {
+		m.Cancel = true
+		return m, nil
+	}
 
+	log.Info().Msg("定时查询推文")
 	fetch := new(fetchTwitter)
 	if err := fetch.main(profile.tweets); err != nil {
 		return m, err
@@ -268,28 +321,31 @@ func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) {
 	if err := fetch.writeTweet(0); err != nil {
 		return m, err
 	}
-	fetch.writeHeader()
-	if err := fetch.urlHandle(); err != nil {
-		return m, err
+	if fetch.wantTweetMap["conversation_id_str"].(string) == conversationId {
+		m.Cancel = true
+		return m, nil
 	}
-	if err := fetch.downloadImage(); err != nil {
-		return m, err
-	}
-	if err := fetch.translateTweet(); err != nil {
-		return m, err
-	}
-	fetch.writeFooter()
 
-	m.AddText(fetch.wantTweetHeader + fetch.wantTweetText + "\n")
-	if fetch.wantTweetImagePath != "" {
-		m.AddImage(fetch.wantTweetImagePath)
-		m.AddText("\n")
+	conversationId = fetch.wantTweetMap["conversation_id_str"].(string)
+	m.AddText("推文推送服务 > " + profile.name + " 的推文：\n")
+	main2(fetch, m)
+
+	return m, nil
+}
+
+func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) {
+	m := new(messagechain.MessageChain)
+	profile := getProfile(calls["account"])
+
+	m.AddText("> " + profile.name + " 的推文：\n")
+	fetch := new(fetchTwitter)
+	if err := fetch.main(profile.tweets); err != nil {
+		return m, err
 	}
-	if fetch.wantTweetAddition != "" {
-		m.AddText("\n" + fetch.wantTweetAddition + "\n")
+	if err := fetch.writeTweet(0); err != nil {
+		return m, err
 	}
-	m.AddText("\n翻译：\n" + fetch.wantTweetTranslationText + "\n")
-	m.AddText(fetch.wantTweetFooter)
+	main2(fetch, m)
 
 	return m, nil
 }
