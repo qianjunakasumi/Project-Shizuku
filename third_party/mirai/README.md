@@ -10,7 +10,7 @@
 
 <h2 align="center">虹咲学园 SHIZUKU 未来彩虹🌈</h2>
 
-SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL执照 开源项目，项目是基于 [Mirai](https://github.com/mamoe/mirai) 提供的 HTTP API 接口开发 及 [腾讯 QQ](https://im.qq.com/) 群组中使用，以偶像为代表的辅助性功能机器人
+SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL许可 开源项目，项目是基于 [Mirai](https://github.com/mamoe/mirai) 提供的 HTTP API 接口开发 及 [腾讯 QQ](https://im.qq.com/) 群组中使用，以偶像为代表的辅助性功能机器人
 
 本项目命名于 [ラブライブ！虹ヶ咲学園スクールアイドル同好会](http://lovelive-anime.jp/nijigasaki/) 中 [桜坂しずく（Osaka Shizuku）](https://lovelive-as.bushimo.jp/member/shizuku/) 的名称，项目中任何涉及包括但不限于偶像姓名、肖像、自我介绍等，其著作权均归 ©プロジェクトラブライブ！虹ヶ咲学園スクールアイドル同好会 所有
 
