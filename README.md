@@ -64,7 +64,7 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 - [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2844d8f57d50a8818bd70e521ca879467ebc47391698ac4216ba14c44a46be56) （推荐）
 - [![邮箱](https://img.shields.io/badge/%E9%82%AE%E7%AE%B1-qianjunakasumi%40gmail.com-brightgreen?style=flat-square)](mailto:qianjunakasumi@gmail.com)
-- [!ssues](https://github.com/qianjunakasumi/shizuku/issues)
+- [Issues](https://github.com/qianjunakasumi/shizuku/issues)
 
 ### 鸣谢
 
@@ -86,7 +86,6 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 ![License](https://img.shields.io/github/license/qianjunakasumi/shizuku?style=flat-square)
 
 GNU Affero General Public License v3.0
-
 
 ```
 Copyright (C) 2020-present  QianjuNakasumi

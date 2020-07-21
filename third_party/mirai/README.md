@@ -31,7 +31,7 @@ SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL执照 开源
 
 [点击下载 mirai-api-http-v1.7.3.jar](https://github.com/project-mirai/mirai-api-http/releases/download/v1.7.2/mirai-api-http-v1.7.2.jar)
 
-将下载的 `mirai-api-http-v1.7.3.jar` 文件保存至本指南所在文件夹 (`plugins/`) 下
+将下载的 `mirai-api-http-v1.7.3.jar` 文件保存至本指南所在文件夹的 `plugins/` 下
 
 运行 `.exe` ，允许通过防火墙（若有），等待加载完毕后关闭程序
 
