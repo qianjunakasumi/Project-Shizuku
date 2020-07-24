@@ -10,8 +10,7 @@
 
 <h2 align="center">虹咲学园 SHIZUKU 未来彩虹🌈</h2>
 
-SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL许可 开源项目，项目是基于 [Mirai](https://github.com/mamoe/mirai) 提供的 HTTP API 接口开发 及 [腾讯 QQ](https://im.qq.com/) 群组中使用，以偶像为代表的辅助性功能机器人
-
+SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL许可 开源项目，项目是基于 [Mirai](https://github.com/mamoe/mirai) 提供的 HTTP API 接口开发 及 [腾讯 QQ](https://im.qq.com/) 群组中使用，以偶像为代表的辅助性功能机器人  
 本项目命名于 [ラブライブ！虹ヶ咲学園スクールアイドル同好会](http://lovelive-anime.jp/nijigasaki/) 中 [桜坂しずく（Osaka Shizuku）](https://lovelive-as.bushimo.jp/member/shizuku/) 的名称，项目中任何涉及包括但不限于偶像姓名、肖像、自我介绍等，其著作权均归 ©プロジェクトラブライブ！虹ヶ咲学園スクールアイドル同好会 所有
 
 ## 介绍
@@ -24,6 +23,7 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
     - 粉丝数查询
     - 粉丝数数据日推
     - 推文查询
+    - 推文推送服务
 
 ### 开发和计划中的功能
 
@@ -74,12 +74,50 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 - [golang-standards/project-layout](https://github.com/golang-standards/project-layout)
 - [语义化版本 2.0.0](https://semver.org/lang/zh-CN/)
+- [Go语言(Golang)编码规范](https://www.bookstack.cn/read/go-code-convention/zh-CN-README.md)
+- [Effective Go](https://golang.org/doc/effective_go.html)
+- [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments)
 
-## 依赖
+## 第三方
+
+> ### 应用程序
 
 - [project-mirai/mirai-api-http](https://github.com/project-mirai/mirai-api-http) AGPL-3.0 许可
+- [LXY1226/MiraiOK](https://github.com/LXY1226/miraiOK)
+- [mariadb](https://mariadb.com/) GPL-2.0 许可
+
+> ### 依赖
+
 - [rs/zerolog](https://github.com/rs/zerolog) MIT 许可
 - [json-iterator/go](https://github.com/json-iterator/go) MIT 许可
+- [gopkg.in/yaml.v2](https://gopkg.in/yaml.v2) Apache 许可
+- [robfig/cron](https://github.com/robfig/cron/) MIT 许可
+- [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql) MPL-2.0 许可
+
+## 赞助
+
+软件的开发和运行都离不开资金的帮助。若您有足够的能力，可向我们提供资金帮助  
+您的赞助将会全款用于项目的开发、维护和运行  
+赞助无任何金额限制，您可根据您的能力和喜好支持我们的工作  
+赞助的钱款流水走向实行全透明公开制度，您可提供[赞助记录]()查阅  
+
+> ### 单次赞助
+
+适用于短期和自定义金额的赞助，钱款将直接进入开发者资金账户
+
+<img width="500" src="https://s1.ax1x.com/2020/07/24/UjtX26.jpg" alt="联合支付">
+
+*不推荐微信支付：我们的服务器依托于阿里云，支付手段为支付宝付款。微信的钱款难以在短时间内被我们使用，造成资金存在而无法使用的窘境
+
+您还可以通过银行卡转账的方式向我们提供帮助，请通过 [联系方式]() 联系我
+
+> ### 订阅赞助
+
+适用于长期和固定金额的赞助，钱款将被平台收取 6% 的费用后进入开发者资金账户
+
+[爱发电](https://afdian.net/@qianjunakasumi)
+
+<img width="500" src="https://s1.ax1x.com/2020/07/24/UvRBPP.png" alt="爱发电">
 
 ## 许可
 
@@ -94,6 +132,7 @@ SHIZUKU💧（以下简称该软件） 由 Qianjunakasumi 开发（以下简称�
 
 我的联系方式：
 
+* Twitter：qianjunakasumi
 * 邮箱：qianjunakasumi@gmail.com
 * QQ：2074466353
 
@@ -104,7 +143,9 @@ SHIZUKU💧（以下简称该软件） 由 Qianjunakasumi 开发（以下简称�
 GNU Affero General Public License v3.0
 
 ```
-Copyright (C) 2020-present  QianjuNakasumi
+Copyright (C) 2020-present QianjuNakasumi
+
+E-mail qianjunakasumi@gmail.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -117,5 +158,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
 ```
