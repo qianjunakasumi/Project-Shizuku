@@ -1,20 +1,55 @@
-/*
-fetchTweets.go: 获取并解析Tweets
-Copyright (C) 2020-present  QianjuNakasumi
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+/***********************************************************************************************************************
+***  P R O J E C T  --  S H I Z U K U                                                   Q I A N J U N A K A S U M I  ***
+************************************************************************************************************************
+* Basic:
+*
+*   Package Name : twitter
+*   File Name    : fetchTweets.go
+*   File Path    : internal/shizuku/twitter/
+*   Author       : Qianjunakasumi
+*   Description  : 获取并解析 Tweet
+*
+*----------------------------------------------------------------------------------------------------------------------*
+* Summary:
+*   Variables:
+*     FetchTweets func(calls map[string]string) -- 公开函数
+*     ScheduleFetchTweets func(call string)     -- 公开函数
+*     conversationIdList map[string]string      -- 存储 Tweet Conversation ID
+*
+*   type fetchTwitter struct                               -- 保存 Tweet 相关信息和提供相关方法的容器
+*     func (f *fetchTwitter) main(id string) error         -- 获取和保存输入的帐号的最新两条 Tweet 并按时间倒序排序生成其索引
+*     func (f *fetchTwitter) writeTweet(which uint8) error -- 获取指定定位的 Tweet 并写入
+*     func (f *fetchTwitter) writeHeader()                 -- 判断 Tweet 类型，套用对应模板，重新生成标准 Tweet 内容
+*     func (f *fetchTwitter) tidyContent()                 -- 转换短链接为原始链接，删除 Tweet 最后可能存在的链接，去除所有
+*                                                             http(s):// 前缀，转义 HTML 转义符
+*     func (f *fetchTwitter) downloadImage()               -- 下载 Tweet 包含的图片的第一张图片缩略图
+*     func (f *fetchTwitter) translateTweet()              -- 调用 百度翻译API 翻译 Tweet
+*     func (f *fetchTwitter) writeFooter()                 -- 添加 Tweet 创建时间和被喜欢次数
+*
+*   func main2(twitter *fetchTwitter, message *messagechain.MessageChain)        -- fetchTwitter 的部分封装
+*   func scheduleFetchTweets(call string) (*messagechain.MessageChain, error)    -- 处理来自 定时任务函数 的调用
+*   func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) -- 处理来自 Uehara 的调用
+*
+*----------------------------------------------------------------------------------------------------------------------*
+* Copyright:
+*
+*   Copyright (C) 2020-present QianjuNakasumi
+*
+*   E-mail qianjunakasumi@gmail.com
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU Affero General Public License as published
+*   by the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU Affero General Public License for more details.
+*
+*   You should have received a copy of the GNU Affero General Public License
+*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*----------------------------------------------------------------------------------------------------------------------*/
 
 package twitter
 
@@ -55,9 +90,9 @@ type fetchTwitter struct {
 }
 
 var (
-	FetchTweets         = fetchTweet          // 获取推文
-	ScheduleFetchTweets = scheduleFetchTweets // 定时推送
-	conversationId      string                // 推文ID
+	FetchTweets         = fetchTweet              // 获取推文
+	ScheduleFetchTweets = scheduleFetchTweets     // 定时推送
+	conversationIdList  = make(map[string]string) // 推文ID列表
 )
 
 // 获取推文 | 建立索引
@@ -313,7 +348,6 @@ func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
 		return m, nil
 	}
 
-	log.Info().Msg("定时查询推文")
 	fetch := new(fetchTwitter)
 	if err := fetch.main(profile.tweets); err != nil {
 		return m, err
@@ -321,12 +355,12 @@ func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
 	if err := fetch.writeTweet(0); err != nil {
 		return m, err
 	}
-	if fetch.wantTweetMap["conversation_id_str"].(string) == conversationId {
+	if fetch.wantTweetMap["conversation_id_str"].(string) == conversationIdList[profile.name] {
 		m.Cancel = true
 		return m, nil
 	}
 
-	conversationId = fetch.wantTweetMap["conversation_id_str"].(string)
+	conversationIdList[profile.name] = fetch.wantTweetMap["conversation_id_str"].(string)
 	m.AddText("推文推送服务 > " + profile.name + " 的推文：\n")
 	main2(fetch, m)
 
