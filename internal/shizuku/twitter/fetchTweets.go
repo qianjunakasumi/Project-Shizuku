@@ -60,7 +60,6 @@ import (
 	"html"
 	"io"
 	"io/ioutil"
-	"math"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -341,7 +340,7 @@ func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
 	profile := getProfile(call)
 
 	x := float64(time.Now().Hour())
-	y := -0.0047*math.Pow(x, 4) + 0.1544*math.Pow(x, 3) - 1.1701*math.Pow(x, 2) + 2.8274*x + 4.8613
+	y := profile.push(x)
 	r := rand.Intn(100)
 	if r > int(y) {
 		m.Cancel = true
