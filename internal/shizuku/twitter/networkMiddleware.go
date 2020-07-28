@@ -1,20 +1,43 @@
-/*
-networkMiddleware.go: 适用于Twitter的网络中间件
-Copyright (C) 2020-present  QianjuNakasumi
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+/***********************************************************************************************************************
+***  P R O J E C T  --  S H I Z U K U                                                   Q I A N J U N A K A S U M I  ***
+************************************************************************************************************************
+* Basic:
+*
+*   Package Name : shizuku
+*   File Name    : networkMiddleware.go
+*   File Path    : internal/shizuku/
+*   Author       : Qianjunakasumi
+*   Description  : 适用于 Twitter 的网络中间件
+*
+*----------------------------------------------------------------------------------------------------------------------*
+* Summary:
+*   Variables:
+*     json -- JSON 解析器
+*
+*   type Content map[string]interface{} -- Twitter API 返回的内容结构
+*
+*   func get(address string) (Content, error) -- GET Twitter API Content
+*
+*----------------------------------------------------------------------------------------------------------------------*
+* Copyright:
+*
+*   Copyright (C) 2020-present QianjuNakasumi
+*
+*   E-mail qianjunakasumi@gmail.com
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU Affero General Public License as published
+*   by the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU Affero General Public License for more details.
+*
+*   You should have received a copy of the GNU Affero General Public License
+*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*----------------------------------------------------------------------------------------------------------------------*/
 
 package twitter
 
@@ -28,7 +51,7 @@ import (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-// Content TwitterAPI内容
+// Content Twitter API内容
 type Content map[string]interface{}
 
 func get(address string) (Content, error) {

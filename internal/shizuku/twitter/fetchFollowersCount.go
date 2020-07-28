@@ -11,7 +11,19 @@
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
-*   待完善
+*   Variables:
+*     FetchFollowersCount    -- 公开函数
+*     ScheduleFollowersCount -- 公开函数
+*
+*   func main(id string) (string, error) -- 获取 Twitter 对象粉丝数
+*
+*   type databaseFollowersTable struct     -- 数据库表字段结构
+*   type pushScheduleFollowersCount struct -- 保存 Twitter 粉丝数计算数据和提供相关方法的容器
+*     func (p *pushScheduleFollowersCount) getDatabaseData(id string) error -- 获取数据库保存的计算数据
+*     func (p *pushScheduleFollowersCount) calcTwitterFollowersData()       -- 计算输出数据
+*
+*   func fetchFollowersCount(calls map[string]string) (*messagechain.MessageChain, error) -- 处理来自 Uehara 的调用
+*   func scheduleFollowersCount(name string) (*messagechain.MessageChain, error)          -- 处理来自 定时任务函数 的调用
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
