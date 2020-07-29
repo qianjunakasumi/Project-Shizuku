@@ -58,7 +58,7 @@ import (
 
 	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // 连接数据库需要的包
 	"github.com/rs/zerolog/log"
 )
 
@@ -93,6 +93,7 @@ var (
 )
 
 func main(id string) (string, error) {
+
 	res, err := get("graphql/-xfUfZsnR_zqjFd-IfrN5A/UserByScreenName?variables=%7B%22screen_name%22%3A%22" + id + "%22%2C%22withHighlightedLabel%22%3Atrue%7D")
 	if err != nil {
 		return "", err
@@ -107,9 +108,11 @@ func main(id string) (string, error) {
 	}
 
 	return strconv.FormatFloat(count, 'f', 0, 64), nil
+
 }
 
 func fetchFollowersCount(calls map[string]string) (*messagechain.MessageChain, error) {
+
 	m := new(messagechain.MessageChain)
 	profile := getProfile(calls["account"])
 	count, err := main(profile.followers)
@@ -121,9 +124,11 @@ func fetchFollowersCount(calls map[string]string) (*messagechain.MessageChain, e
 	m.AddText(count)
 
 	return m, nil
+
 }
 
 func (p *pushScheduleFollowersCount) getDatabaseData(id string) error {
+
 	db, err := sql.Open("mysql", configs.Conf.Databaseurl)
 	if err != nil {
 		return err
@@ -214,6 +219,7 @@ ORDER BY twitter_followers.date DESC`, shangyue+id)
 	}
 
 	return nil
+
 }
 
 func (p *pushScheduleFollowersCount) calcTwitterFollowersData() {

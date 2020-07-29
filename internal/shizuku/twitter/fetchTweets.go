@@ -73,6 +73,7 @@ import (
 	"github.com/qianjunakasumi/shizuku/configs"
 	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
 	"github.com/qianjunakasumi/shizuku/pkg/networkware"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -96,6 +97,7 @@ var (
 
 // 获取推文 | 建立索引
 func (f *fetchTwitter) main(id string) error {
+
 	res, err := get("2/timeline/profile/" + id + ".json?include_profile_interstitial_type=1&include_blocking=1&include_blocked_by=1&include_followed_by=1&include_want_retweets=1&include_mute_edge=1&include_can_dm=1&include_can_media_tag=1&skip_status=1&cards_platform=Web-12&include_cards=1&include_composer_source=true&include_ext_alt_text=true&include_reply_count=1&tweet_mode=extended&include_entities=true&include_user_entities=true&include_ext_media_availability=true&send_error_codes=true&simple_quoted_tweet=true&include_tweet_replies=false&count=2&ext=mediaStats%2ChighlightedLabel%2CcameraMoment")
 	if err != nil {
 		return err
@@ -116,10 +118,12 @@ func (f *fetchTwitter) main(id string) error {
 	sort.Sort(sort.Reverse(sort.StringSlice(f.tweetsListIndex)))
 
 	return nil
+
 }
 
 // 传入索引拉取推文对象和内容
 func (f *fetchTwitter) writeTweet(which uint8) error {
+
 	v, ok := f.tweetsList[f.tweetsListIndex[which]].(map[string]interface{})
 	if !ok {
 		return errors.New("ok is not true")
@@ -129,6 +133,7 @@ func (f *fetchTwitter) writeTweet(which uint8) error {
 	f.wantTweetText = v["full_text"].(string)
 
 	return nil
+
 }
 
 // 判断并写入要获取的推文的标头 | 修正内容
@@ -157,6 +162,7 @@ func (f *fetchTwitter) writeHeader() {
 
 // 去除后缀链接 | 替换为原始链接 | 去除 http(s):// | 转换HTML转义符
 func (f *fetchTwitter) tidyContent() {
+
 	tweetURLs, ok := (f.wantTweetMap["entities"].(map[string]interface{}))["urls"].([]interface{})
 	if !ok {
 		// 针对无链接但存在引用例如转推或图片等扩展内容链接下的URL删除
@@ -185,10 +191,12 @@ func (f *fetchTwitter) tidyContent() {
 
 	f.wantTweetText = html.UnescapeString(f.wantTweetText)
 	f.wantTweetAddition = html.UnescapeString(f.wantTweetAddition)
+
 }
 
 // 下载第一张图片缩略图
 func (f *fetchTwitter) downloadImage() {
+
 	tweetMedia, ok := (f.wantTweetMap["entities"].(map[string]interface{}))["media"].([]interface{})
 	if !ok {
 		return
@@ -251,10 +259,12 @@ func (f *fetchTwitter) downloadImage() {
 	}
 
 	f.wantTweetImagePath = path2
+
 }
 
 // 翻译推文
 func (f *fetchTwitter) translateTweet() {
+
 	content := f.wantTweetText
 	reg, err := regexp.Compile(`[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`)
 	if err != nil {
@@ -302,21 +312,26 @@ func (f *fetchTwitter) translateTweet() {
 			Msg("解析翻译内容时出错")
 		return
 	}
+
 	for i := 0; i < len(transList); i++ {
 		f.wantTweetTranslationText += transList[i].(map[string]interface{})["dst"].(string) + "\n"
 	}
+
 }
 
 // 写入脚注信息
 func (f *fetchTwitter) writeFooter() {
+
 	t, _ := time.Parse("Mon Jan 02 15:04:05 +0000 2006", f.wantTweetMap["created_at"].(string))
 	beijing, _ := time.LoadLocation("Local")
 	favoriteCount := strconv.FormatFloat(f.wantTweetMap["favorite_count"].(float64), 'f', 0, 64)
 
 	f.wantTweetFooter = "发送时间：" + t.In(beijing).Format("01月02日 15时04分") + "\n被喜欢次数：" + favoriteCount
+
 }
 
 func main2(twitter *fetchTwitter, message *messagechain.MessageChain) {
+
 	twitter.writeHeader()
 	twitter.tidyContent()
 	twitter.downloadImage()
@@ -333,9 +348,11 @@ func main2(twitter *fetchTwitter, message *messagechain.MessageChain) {
 	}
 	message.AddText("\n翻译：\n" + twitter.wantTweetTranslationText + "\n")
 	message.AddText(twitter.wantTweetFooter)
+
 }
 
 func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
+
 	m := new(messagechain.MessageChain)
 	profile := getProfile(call)
 
@@ -364,9 +381,11 @@ func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
 	main2(fetch, m)
 
 	return m, nil
+
 }
 
 func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) {
+
 	m := new(messagechain.MessageChain)
 	profile := getProfile(calls["account"])
 
@@ -381,4 +400,5 @@ func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) {
 	main2(fetch, m)
 
 	return m, nil
+
 }

@@ -3,9 +3,9 @@
 ************************************************************************************************************************
 * Basic:
 *
-*   Package Name : shizuku
+*   Package Name : twitter
 *   File Name    : networkMiddleware.go
-*   File Path    : internal/shizuku/
+*   File Path    : internal/shizuku/twitter/
 *   Author       : Qianjunakasumi
 *   Description  : Twitter 支持帐号列表信息
 *

@@ -1,5 +1,4 @@
-/*
-Package twitter
+/* Package twitter
 
 ************************************************************************************************************************
 ***  P R O J E C T  --  S H I Z U K U                                                   Q I A N J U N A K A S U M I  ***
@@ -41,5 +40,5 @@ Package twitter
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*
-*/
+ */
 package twitter
