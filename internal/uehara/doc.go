@@ -1,21 +1,23 @@
-/***********************************************************************************************************************
+/* Package uehara
+
+************************************************************************************************************************
 ***  P R O J E C T  --  S H I Z U K U                                                   Q I A N J U N A K A S U M I  ***
 ************************************************************************************************************************
 * Basic:
 *
-*   Package Name : messagechain
-*   File Name    : main.go
-*   File Path    : internal/uehara/messageChain/
+*   Package Name : uehara
+*   File Name    : doc.go
+*   File Path    : internal/uehara/
 *   Author       : Qianjunakasumi
-*   Description  : 适用于 Mirai 的消息链
+*   Description  : 包文档
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
-*   type MessageChain struct -- 存储消息信息和提供相关方法的容器
-*
-*   func (m *MessageChain) AddText(str string)   -- 添加文本
-*   func (m *MessageChain) AddAt(target uint32)  -- 添加提醒
-*   func (m *MessageChain) AddImage(path string) -- 添加图片
+*   action.go            -- SHIZUKU 应用的定义和引用
+*   doc.go               -- 包文档
+*   main.go              -- 消息主入口命令处理
+*   networkMiddleware.go -- 适用于 Mirai 的网络中间件
+*   util.go              -- 与 Mirai 通讯的最小单元模块
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -36,37 +38,6 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
-*----------------------------------------------------------------------------------------------------------------------*/
-
-package messagechain
-
-// MessageChain 消息链
-type MessageChain struct {
-	Content []map[string]interface{}
-	Cancel  bool
-}
-
-// AddText 插入文本
-func (m *MessageChain) AddText(str string) {
-	m.Content = append(m.Content, map[string]interface{}{
-		"type": "Plain",
-		"text": str,
-	})
-}
-
-// AddAt 插入提醒
-func (m *MessageChain) AddAt(target uint32) {
-	m.Content = append(m.Content, map[string]interface{}{
-		"type":    "At",
-		"target":  target,
-		"display": "@",
-	})
-}
-
-// AddImage 插入图片
-func (m *MessageChain) AddImage(path string) {
-	m.Content = append(m.Content, map[string]interface{}{
-		"type": "Image",
-		"path": "../../../../../" + path,
-	})
-}
+*----------------------------------------------------------------------------------------------------------------------*
+ */
+package uehara
