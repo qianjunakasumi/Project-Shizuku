@@ -48,7 +48,7 @@
 *   GNU Affero General Public License for more details.
 *
 *   You should have received a copy of the GNU Affero General Public License
-*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
 package twitter
@@ -70,9 +70,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qianjunakasumi/shizuku/configs"
-	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
-	"github.com/qianjunakasumi/shizuku/pkg/networkware"
+	"github.com/qianjunakasumi/project-shizuku/configs"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
+	"github.com/qianjunakasumi/project-shizuku/pkg/networkware"
 
 	"github.com/rs/zerolog/log"
 )
@@ -180,6 +180,9 @@ func (f *fetchTwitter) tidyContent() {
 	}
 
 	reg, err := regexp.Compile(`https://t.co/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`)
+	if err != nil {
+		return
+	}
 	reg2, err := regexp.Compile(`https?://`)
 	if err != nil {
 		return
@@ -294,6 +297,13 @@ func (f *fetchTwitter) translateTweet() {
 		return
 	}
 	robots, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Warn().
+			Str("包名", "twitter").
+			Str("方法", "translateTweet").
+			Msg("读取翻译API内容时出错")
+		return
+	}
 	defer res.Body.Close()
 
 	result := make(map[string]interface{})

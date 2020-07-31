@@ -36,7 +36,7 @@
 *   GNU Affero General Public License for more details.
 *
 *   You should have received a copy of the GNU Affero General Public License
-*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
 package twitter
@@ -44,7 +44,7 @@ package twitter
 import (
 	"io/ioutil"
 
-	"github.com/qianjunakasumi/shizuku/pkg/networkware"
+	"github.com/qianjunakasumi/project-shizuku/pkg/networkware"
 
 	jsoniter "github.com/json-iterator/go"
 )

@@ -1,4 +1,4 @@
-module github.com/qianjunakasumi/shizuku
+module github.com/qianjunakasumi/project-shizuku
 
 go 1.14
 

@@ -31,7 +31,7 @@
 *   GNU Affero General Public License for more details.
 *
 *   You should have received a copy of the GNU Affero General Public License
-*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
 package main
@@ -40,8 +40,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/qianjunakasumi/shizuku/configs"
-	"github.com/qianjunakasumi/shizuku/internal/shizuku"
+	"github.com/qianjunakasumi/project-shizuku/configs"
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

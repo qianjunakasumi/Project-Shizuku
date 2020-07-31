@@ -39,7 +39,7 @@
 *   GNU Affero General Public License for more details.
 *
 *   You should have received a copy of the GNU Affero General Public License
-*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
 package uehara
@@ -48,7 +48,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
 
 	"github.com/rs/zerolog/log"
 )

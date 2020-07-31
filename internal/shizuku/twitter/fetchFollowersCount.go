@@ -43,7 +43,7 @@
 *   GNU Affero General Public License for more details.
 *
 *   You should have received a copy of the GNU Affero General Public License
-*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
 package twitter
@@ -52,11 +52,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/qianjunakasumi/shizuku/configs"
 	"strconv"
 	"time"
 
-	"github.com/qianjunakasumi/shizuku/internal/uehara/messagechain"
+	"github.com/qianjunakasumi/project-shizuku/configs"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
 
 	_ "github.com/go-sql-driver/mysql" // 连接数据库需要的包
 	"github.com/rs/zerolog/log"
@@ -206,6 +206,9 @@ ORDER BY twitter_followers.date DESC`, shangyue+id)
 			&shangyueData.ydayHuanbiRate,
 			&shangyueData.dingjiRate,
 			&shangyueData.syueDingjiRate)
+		if err != nil {
+			return err
+		}
 	}
 
 	p.yesterdayFollowersCount = yesterdayData.followersCount // 昨日粉丝数

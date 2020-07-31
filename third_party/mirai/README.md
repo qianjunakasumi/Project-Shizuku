@@ -4,14 +4,13 @@
 <p align="center">
     <img src="https://img.shields.io/badge/%E4%BA%A7%E5%93%81%E5%90%8D%E7%A7%B0-SHIZUKU%F0%9F%92%A7-brightgreen?style=flat-square" alt="产品名称">
     <img src="https://img.shields.io/badge/%E5%BC%80%E5%8F%91%E5%9B%A2%E9%98%9F-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square" alt="开发团队">
-    <a href="https://goreportcard.com/report/github.com/qianjunakasumi/shizuku"><img src="https://goreportcard.com/badge/github.com/qianjunakasumi/shizuku?style=flat-square" alt="Go Report Card"></a>
-    <img src="https://img.shields.io/github/repo-size/qianjunakasumi/shizuku?style=flat-square" alt="repo size">
+    <a href="https://goreportcard.com/report/github.com/qianjunakasumi/project-shizuku"><img src="https://goreportcard.com/badge/github.com/qianjunakasumi/project-shizuku?style=flat-square" alt="Go Report Card"></a>
+    <img src="https://img.shields.io/github/repo-size/qianjunakasumi/project-shizuku?style=flat-square" alt="repo size">
 </p>
 
 <h2 align="center">虹咲学园 SHIZUKU 未来彩虹🌈</h2>
 
-SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL许可 开源项目，项目是基于 [Mirai](https://github.com/mamoe/mirai) 提供的 HTTP API 接口开发 及 [腾讯 QQ](https://im.qq.com/) 群组中使用，以偶像为代表的辅助性功能机器人
-
+SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的一个 AGPL许可 开源项目，项目是基于 [Mirai](https://github.com/mamoe/mirai) 提供的 HTTP API 接口开发 及 [腾讯 QQ](https://im.qq.com/) 群组中使用，以偶像为代表的辅助性功能机器人  
 本项目命名于 [ラブライブ！虹ヶ咲学園スクールアイドル同好会](http://lovelive-anime.jp/nijigasaki/) 中 [桜坂しずく（Osaka Shizuku）](https://lovelive-as.bushimo.jp/member/shizuku/) 的名称，项目中任何涉及包括但不限于偶像姓名、肖像、自我介绍等，其著作权均归 ©プロジェクトラブライブ！虹ヶ咲学園スクールアイドル同好会 所有
 
 ## SHIZUKU 第三方应用之 Mirai 安装指南

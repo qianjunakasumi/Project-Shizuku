@@ -37,14 +37,14 @@
 *   GNU Affero General Public License for more details.
 *
 *   You should have received a copy of the GNU Affero General Public License
-*   along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+*   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
 package uehara
 
 import (
-	"github.com/qianjunakasumi/shizuku/configs"
-	"github.com/qianjunakasumi/shizuku/internal/shizuku/twitter"
+	"github.com/qianjunakasumi/project-shizuku/configs"
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku/twitter"
 
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
@@ -107,6 +107,11 @@ func schedule() {
 			log.Error().Err(err)
 		}
 	})
+	if err != nil {
+		log.Error().Err(err)
+		return
+	}
+
 	_, err = c.AddFunc("* * * * *", func() {
 		m, err := twitter.ScheduleFetchTweets("lovelive")
 		if err != nil {
@@ -118,6 +123,11 @@ func schedule() {
 			log.Error().Err(err)
 		}
 	})
+	if err != nil {
+		log.Error().Err(err)
+		return
+	}
+
 	_, err = c.AddFunc("* * * * *", func() {
 		m, err := twitter.ScheduleFetchTweets("前田")
 		if err != nil {
@@ -129,7 +139,6 @@ func schedule() {
 			log.Error().Err(err)
 		}
 	})
-
 	if err != nil {
 		log.Error().Err(err)
 		return

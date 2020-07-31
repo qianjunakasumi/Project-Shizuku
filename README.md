@@ -4,8 +4,8 @@
 <p align="center">
     <img src="https://img.shields.io/badge/%E4%BA%A7%E5%93%81%E5%90%8D%E7%A7%B0-SHIZUKU%F0%9F%92%A7-brightgreen?style=flat-square" alt="产品名称">
     <img src="https://img.shields.io/badge/%E5%BC%80%E5%8F%91%E5%9B%A2%E9%98%9F-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square" alt="开发团队">
-    <a href="https://goreportcard.com/report/github.com/qianjunakasumi/shizuku"><img src="https://goreportcard.com/badge/github.com/qianjunakasumi/shizuku?style=flat-square" alt="Go Report Card"></a>
-    <img src="https://img.shields.io/github/repo-size/qianjunakasumi/shizuku?style=flat-square" alt="repo size">
+    <a href="https://goreportcard.com/report/github.com/qianjunakasumi/project-shizuku"><img src="https://goreportcard.com/badge/github.com/qianjunakasumi/project-shizuku?style=flat-square" alt="Go Report Card"></a>
+    <img src="https://img.shields.io/github/repo-size/qianjunakasumi/project-shizuku?style=flat-square" alt="repo size">
 </p>
 
 <h2 align="center">虹咲学园 SHIZUKU 未来彩虹🌈</h2>
@@ -64,7 +64,7 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 - [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2844d8f57d50a8818bd70e521ca879467ebc47391698ac4216ba14c44a46be56) （推荐）
 - [![邮箱](https://img.shields.io/badge/%E9%82%AE%E7%AE%B1-qianjunakasumi%40gmail.com-brightgreen?style=flat-square)](mailto:qianjunakasumi@gmail.com)
-- [Issues](https://github.com/qianjunakasumi/shizuku/issues)
+- [Issues](https://github.com/qianjunakasumi/project-shizuku/issues)
 
 ### 鸣谢
 
@@ -138,7 +138,7 @@ SHIZUKU💧（以下简称该软件） 由 Qianjunakasumi 开发（以下简称�
 
 > ### 许可证
 
-![License](https://img.shields.io/github/license/qianjunakasumi/shizuku?style=flat-square)
+![License](https://img.shields.io/github/license/qianjunakasumi/project-shizuku?style=flat-square)
 
 GNU Affero General Public License v3.0
 
@@ -158,5 +158,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see https://github.com/qianjunakasumi/shizuku/blob/master/LICENSE.
+along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 ```
