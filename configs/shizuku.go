@@ -54,14 +54,15 @@ type conf struct {
 }
 
 var (
-	Conf      conf           // 配置文件
-	Version   = "0.1.0-beta" // 版本
-	BuildTime string         // 编译时的日期和时间
-	CommitId  string         // 存储库最新提交的短SHA1
+	Conf      conf      // 配置文件
+	Version   = "1.0.0" // 版本
+	BuildTime string    // 编译时的日期和时间
+	CommitId  string    // 存储库最新提交的短SHA1
 )
 
 // SetConfigs 配置配置参数
 func SetConfigs() error {
+
 	file, err := ioutil.ReadFile("configs/configs.yml")
 	if err != nil {
 		return err
@@ -73,4 +74,5 @@ func SetConfigs() error {
 	}
 
 	return nil
+
 }
