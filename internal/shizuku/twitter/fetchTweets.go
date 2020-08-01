@@ -96,9 +96,9 @@ var (
 )
 
 // 获取推文 | 建立索引
-func (f *fetchTwitter) main(id string) error {
+func (f *fetchTwitter) main(id string, seq uint64) error {
 
-	res, err := get("2/timeline/profile/" + id + ".json?include_profile_interstitial_type=1&include_blocking=1&include_blocked_by=1&include_followed_by=1&include_want_retweets=1&include_mute_edge=1&include_can_dm=1&include_can_media_tag=1&skip_status=1&cards_platform=Web-12&include_cards=1&include_composer_source=true&include_ext_alt_text=true&include_reply_count=1&tweet_mode=extended&include_entities=true&include_user_entities=true&include_ext_media_availability=true&send_error_codes=true&simple_quoted_tweet=true&include_tweet_replies=false&count=2&ext=mediaStats%2ChighlightedLabel%2CcameraMoment")
+	res, err := get("2/timeline/profile/" + id + ".json?include_profile_interstitial_type=1&include_blocking=1&include_blocked_by=1&include_followed_by=1&include_want_retweets=1&include_mute_edge=1&include_can_dm=1&include_can_media_tag=1&skip_status=1&cards_platform=Web-12&include_cards=1&include_composer_source=true&include_ext_alt_text=true&include_reply_count=1&tweet_mode=extended&include_entities=true&include_user_entities=true&include_ext_media_availability=true&send_error_codes=true&simple_quoted_tweet=true&include_tweet_replies=false&count=" + strconv.FormatUint(seq+1, 10) + "&ext=mediaStats%2ChighlightedLabel%2CcameraMoment")
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (f *fetchTwitter) main(id string) error {
 }
 
 // 传入索引拉取推文对象和内容
-func (f *fetchTwitter) writeTweet(which uint8) error {
+func (f *fetchTwitter) writeTweet(which uint64) error {
 
 	v, ok := f.tweetsList[f.tweetsListIndex[which]].(map[string]interface{})
 	if !ok {
@@ -375,7 +375,7 @@ func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
 	}
 
 	fetch := new(fetchTwitter)
-	if err := fetch.main(profile.tweets); err != nil {
+	if err := fetch.main(profile.tweets, 1); err != nil {
 		return m, err
 	}
 	if err := fetch.writeTweet(0); err != nil {
@@ -394,17 +394,22 @@ func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
 
 }
 
-func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) {
+func fetchTweet(calls map[string]string, info *messagechain.MessageInfo) (*messagechain.MessageChain, error) {
 
 	m := new(messagechain.MessageChain)
 	profile := getProfile(calls["account"])
 
-	m.AddText("> " + profile.name + " 的推文：\n")
-	fetch := new(fetchTwitter)
-	if err := fetch.main(profile.tweets); err != nil {
+	sequence, err := strconv.ParseUint(calls["sequence"], 10, 8)
+	if err != nil {
 		return m, err
 	}
-	if err := fetch.writeTweet(0); err != nil {
+
+	m.AddText("> " + profile.name + " 的推文：\n")
+	fetch := new(fetchTwitter)
+	if err := fetch.main(profile.tweets, sequence); err != nil {
+		return m, err
+	}
+	if err := fetch.writeTweet(sequence - 1); err != nil {
 		return m, err
 	}
 	main2(fetch, m)
