@@ -68,17 +68,17 @@ func writeDefaults(expand2 []expand) map[string]string {
 
 }
 
-func isExistKey(keys []expand, str string) string {
+func isExistKey(keys []expand, str string) (string, int) {
 
-	for _, v := range keys {
+	for k, v := range keys {
 		for _, v2 := range v.key {
 			if v2 == str {
-				return v.name
+				return v.name, k
 			}
 		}
 	}
 
-	return ""
+	return "", 0
 
 }
 
@@ -98,19 +98,17 @@ func isLimit(limit []string, str string) bool {
 
 }
 
-func writeCalls(fields *map[string]string, calls *[]string, action *map[string]interface{}) string {
+func writeCalls(fields *map[string]string, calls *[]string, expand2 []expand) string {
 
-	callsLen := len(*calls)
 	i := 0
 
 	for k := range *fields {
-		if i == callsLen { // 如果索引等于传入的值长度时则退出，这时已无法取到传入的值
+
+		if i == len(*calls) { // 如果索引等于传入的值长度时则退出，这时已无法取到传入的值
 			break
 		}
 
 		callSplit := strings.Split((*calls)[i], "：") // 以“：”分割字符串，当长度为 2 时则是指定参数方式
-
-		expand2 := (*action)["expand"].([]expand)
 
 		if len(callSplit) < 2 {
 
@@ -122,30 +120,32 @@ func writeCalls(fields *map[string]string, calls *[]string, action *map[string]i
 
 		} else {
 
-			name := isExistKey(expand2, callSplit[0])
+			name, ii := isExistKey(expand2, callSplit[0])
+
 			if name == "" {
 				return "您输入的字段不符合标准，我们推荐以下字段：" + fmt.Sprintf("%v", expand2[i].key)
 			}
 
-			if isLimit(expand2[i].limit, callSplit[1]) {
+			if isLimit(expand2[ii].limit, callSplit[1]) {
 				(*fields)[name] = callSplit[1]
 			} else {
-				return "您输入的值不符合标准，我们推荐以下值：" + fmt.Sprintf("%v", expand2[i].limit)
+				return "您输入的值不符合标准，我们推荐以下值：" + fmt.Sprintf("%v", expand2[ii].limit)
 			}
 
 		}
 
 		i++
+
 	}
 
 	return ""
 
 }
 
-func handle(calls *[]string, msg *Message, action *map[string]interface{}) {
+func handle(calls *[]string, msgInfo *messagechain.MessageInfo, action *action) {
 
-	fields := writeDefaults((*action)["expand"].([]expand))
-	errMsg := writeCalls(&fields, calls, action)
+	fields := writeDefaults(action.expand)
+	errMsg := writeCalls(&fields, calls, action.expand)
 	var msgChain *messagechain.MessageChain
 
 	log.Info().Msg("查询详情：" + fmt.Sprintf("%v", fields))
@@ -159,60 +159,68 @@ func handle(calls *[]string, msg *Message, action *map[string]interface{}) {
 
 		var err error
 
-		// 取出(*actions)的值，定位"func"字段，类型断言为相同的函数类型,取出函数指针的值，执行函数
-		msgChain, err = (*((*action)["func"].(*func(calls map[string]string) (*messagechain.MessageChain, error))))(fields)
+		// 取出函数指针的值，执行函数
+		msgChain, err = (*(action.fun))(fields, msgInfo)
 		if err != nil {
 			msgChain.AddText("\n执行时发生错误，调试信息：" + fmt.Sprintf("%v", err))
 		}
 
 	}
 
-	err := SendGroupMessage(uint32((*msg)["sender"].(map[string]interface{})["group"].(map[string]interface{})["id"].(float64)), msgChain)
+	err := SendGroupMessage(msgInfo.GroupId, msgChain)
 	if err != nil {
 		return
 	}
 
 }
 
-func receive(msg Message) error {
+func receive(msg Message) {
 
 	if msg["type"] != "GroupMessage" {
-		return nil
+		return
 	}
 
 	msgChain := msg["messageChain"].([]interface{})
 
 	if len(msgChain) < 2 {
-		return nil
+		return
 	}
 
 	mainMsg := msgChain[1].(map[string]interface{})
 
-	if mainMsg["type"] != "Plain" {
-		return nil
-	}
+	msgInfo := new(messagechain.MessageInfo)
 
-	calls := strings.Fields(mainMsg["text"].(string))
-	if len(calls) < 1 {
-		return nil
-	}
+	msgInfo.UserId = uint32((msg["sender"].(map[string]interface{}))["id"].(float64))
+	msgInfo.UserName = (msg["sender"].(map[string]interface{}))["memberName"].(string)
+	msgInfo.GroupId = uint32(((msg["sender"].(map[string]interface{}))["group"].(map[string]interface{}))["id"].(float64))
+	msgInfo.GroupName = ((msg["sender"].(map[string]interface{}))["group"].(map[string]interface{}))["name"].(string)
 
-	for _, v := range actions {
+	switch mainMsg["type"] {
+	case "Plain":
 
-		for _, v2 := range v["key"].([]string) {
+		calls := strings.Fields(mainMsg["text"].(string))
+		if len(calls) < 1 {
+			return
+		}
 
-			if calls[0] == v2 {
+		for _, v := range actions {
 
-				calls2 := calls[1:]
-				handle(&calls2, &msg, &v)
+			for _, v2 := range v.key {
+
+				if calls[0] == v2 {
+
+					calls2 := calls[1:]
+					handle(&calls2, msgInfo, &v)
+
+				}
 
 			}
 
 		}
 
-	}
+	case "Image":
 
-	return nil
+	}
 
 }
 

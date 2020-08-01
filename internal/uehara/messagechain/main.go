@@ -46,6 +46,13 @@ type MessageChain struct {
 	Cancel  bool
 }
 
+type MessageInfo struct {
+	UserName  string
+	UserId    uint32
+	GroupName string
+	GroupId   uint32
+}
+
 // AddText 插入文本
 func (m *MessageChain) AddText(str string) {
 	m.Content = append(m.Content, map[string]interface{}{
