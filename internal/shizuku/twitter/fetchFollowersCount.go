@@ -111,7 +111,7 @@ func main(id string) (string, error) {
 
 }
 
-func fetchFollowersCount(calls map[string]string) (*messagechain.MessageChain, error) {
+func fetchFollowersCount(calls map[string]string, info *messagechain.MessageInfo) (*messagechain.MessageChain, error) {
 
 	m := new(messagechain.MessageChain)
 	profile := getProfile(calls["account"])
@@ -121,7 +121,15 @@ func fetchFollowersCount(calls map[string]string) (*messagechain.MessageChain, e
 	}
 
 	m.AddText("> " + profile.name + " 粉丝数：\n")
-	m.AddText(count)
+
+	countUint, err := strconv.ParseUint(count, 10, 32)
+	wanCountUint := float64(countUint) / 10000
+
+	// 输出千分位，阻止百分位非 9 数进一，删除最后一位小数，提高精确度
+	wanCountString := strconv.FormatFloat(wanCountUint, 'f', 3, 64)
+	wanCountString = wanCountString[:len(wanCountString)-1]
+
+	m.AddText(count + " — 约 " + wanCountString + " 万")
 
 	return m, nil
 
