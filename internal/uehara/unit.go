@@ -137,9 +137,7 @@ func listen() error {
 			if err := websocket.JSON.Receive(ws, &msg); err != nil {
 				return
 			}
-			if err = receive(msg); err != nil {
-				return
-			}
+			receive(msg)
 		}
 	}()
 
