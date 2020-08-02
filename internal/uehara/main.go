@@ -17,7 +17,7 @@
 *   func isExistKey(keys []expand, str string) string                                                  -- 判断是否存在字段
 *   func isLimit(limit []string, str string) bool                                                      -- 判断是否超出限制
 *   func writeCalls(fields *map[string]string, calls *[]string, action *map[string]interface{}) string -- 写入命令的输入值
-*   func handle(calls *[]string, msg *Message, action *map[string]interface{})                         -- 处理命令
+*   func handlePlain(calls *[]string, msg *Message, action *map[string]interface{})                    -- 处理命令
 *   func receive(msg Message) error                                                                    -- 提取消息基本信息
 *   func Connect() error                                                                               -- 启动 UEHARA
 *
@@ -48,6 +48,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/qianjunakasumi/project-shizuku/configs"
 	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
 
 	"github.com/rs/zerolog/log"
@@ -98,7 +99,9 @@ func isLimit(limit []string, str string) bool {
 
 }
 
-func writeCalls(fields *map[string]string, calls *[]string, expand2 []expand) string {
+func writeCalls(
+	fields *map[string]string, calls *[]string, expand2 []expand,
+) string {
 
 	i := 0
 
@@ -142,11 +145,15 @@ func writeCalls(fields *map[string]string, calls *[]string, expand2 []expand) st
 
 }
 
-func handle(calls *[]string, msgInfo *messagechain.MessageInfo, action *action) {
+func handlePlain(
+	calls *[]string, msgInfo *messagechain.MessageInfo, action *action,
+) {
 
-	fields := writeDefaults(action.expand)
-	errMsg := writeCalls(&fields, calls, action.expand)
-	var msgChain *messagechain.MessageChain
+	var (
+		fields   = writeDefaults(action.expand)
+		errMsg   = writeCalls(&fields, calls, action.expand)
+		msgChain *messagechain.MessageChain
+	)
 
 	log.Info().Msg("查询详情：" + fmt.Sprintf("%v", fields))
 
@@ -167,10 +174,47 @@ func handle(calls *[]string, msgInfo *messagechain.MessageInfo, action *action) 
 
 	}
 
-	err := SendGroupMessage(msgInfo.GroupId, msgChain)
-	if err != nil {
+	SendGroupMessage(msgInfo.GroupId, msgChain)
+
+}
+
+func handleQuote(
+	mainMsg map[string]interface{}, msgChain []interface{}, msgInfo *messagechain.MessageInfo,
+) {
+
+	if uint32(mainMsg["senderId"].(float64)) != configs.Conf.QQNumber {
 		return
 	}
+
+	if configs.QuoteJob[msgInfo.UserId] == nil {
+		return
+	}
+
+	var text string
+
+	for i := 2; i < len(msgChain); i++ {
+
+		if (msgChain[i].(map[string]interface{}))["type"] == "Plain" {
+			text = (msgChain[i].(map[string]interface{}))["text"].(string)
+		}
+
+	}
+
+	if text == "" {
+		return
+	}
+
+	var (
+		fun = configs.QuoteJob[msgInfo.UserId]
+		m   *messagechain.MessageChain
+	)
+
+	m, err := (*fun)(text, msgInfo)
+	if err != nil {
+		m.AddText("\n执行时发生错误，调试信息：" + fmt.Sprintf("%v", err))
+	}
+
+	SendGroupMessage(msgInfo.GroupId, m)
 
 }
 
@@ -186,9 +230,10 @@ func receive(msg Message) {
 		return
 	}
 
-	mainMsg := msgChain[1].(map[string]interface{})
-
-	msgInfo := new(messagechain.MessageInfo)
+	var (
+		mainMsg = msgChain[1].(map[string]interface{})
+		msgInfo = new(messagechain.MessageInfo)
+	)
 
 	msgInfo.UserId = uint32((msg["sender"].(map[string]interface{}))["id"].(float64))
 	msgInfo.UserName = (msg["sender"].(map[string]interface{}))["memberName"].(string)
@@ -196,6 +241,7 @@ func receive(msg Message) {
 	msgInfo.GroupName = ((msg["sender"].(map[string]interface{}))["group"].(map[string]interface{}))["name"].(string)
 
 	switch mainMsg["type"] {
+
 	case "Plain":
 
 		calls := strings.Fields(mainMsg["text"].(string))
@@ -210,7 +256,7 @@ func receive(msg Message) {
 				if calls[0] == v2 {
 
 					calls2 := calls[1:]
-					handle(&calls2, msgInfo, &v)
+					handlePlain(&calls2, msgInfo, &v)
 
 				}
 
@@ -220,6 +266,8 @@ func receive(msg Message) {
 
 	case "Image":
 
+	case "Quote":
+		handleQuote(mainMsg, msgChain, msgInfo)
 	}
 
 }
