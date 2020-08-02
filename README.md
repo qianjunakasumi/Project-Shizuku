@@ -160,3 +160,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 ```
+
+## 法律法规
+
+包括但不限于使用、二开等行为请遵守中华人民共和国法律
+
+**我们不为任何人背书，不提供任何默示保证**
