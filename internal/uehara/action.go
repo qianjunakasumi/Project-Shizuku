@@ -44,7 +44,12 @@ package uehara
 
 import (
 	"github.com/qianjunakasumi/project-shizuku/configs"
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku/llas"
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku/meme"
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku/shizuku"
 	"github.com/qianjunakasumi/project-shizuku/internal/shizuku/twitter"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
+	"github.com/qianjunakasumi/project-shizuku/pkg/database"
 
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
@@ -59,24 +64,41 @@ type expand struct {
 	defaults string
 }
 
-var actions = []map[string]interface{}{
+type action struct {
+	name   string
+	key    []string
+	expand []expand
+	fun    *func(calls map[string]string, info *messagechain.MessageInfo) (*messagechain.MessageChain, error)
+}
+
+var actions = []action{
 	{
-		"name": "FetchTweet",
-		"key":  []string{"查询推文", "推文", "获取推文", "推文查询", "推文获取"},
-		"expand": []expand{{
-			"account",
-			"帐号",
-			[]string{"帐号", "声优", "偶像"},
-			twitter.GetKeys(),
-			false,
-			"前田",
-		}},
-		"func": &twitter.FetchTweets,
+		"FetchTweet",
+		[]string{"查询推文", "推文", "获取推文", "推文查询", "推文获取", "cxtw", "tw", "tweet"},
+		[]expand{
+			{
+				"account",
+				"帐号",
+				[]string{"帐号", "声优", "偶像"},
+				twitter.GetKeys(),
+				false,
+				"前田",
+			},
+			{
+				"sequence",
+				"次第",
+				[]string{"第", "次第"},
+				[]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"},
+				false,
+				"1",
+			},
+		},
+		&twitter.FetchTweets,
 	},
 	{
-		"name": "FetchFollowersCount",
-		"key":  []string{"查询粉丝", "粉丝", "获取粉丝", "粉丝查询", "粉丝获取"},
-		"expand": []expand{{
+		"FetchFollowersCount",
+		[]string{"查询粉丝", "粉丝", "获取粉丝", "粉丝查询", "粉丝获取", "cxfs", "fs", "fscx", "fans"},
+		[]expand{{
 			"account",
 			"帐号",
 			[]string{"帐号", "声优", "偶像"},
@@ -84,7 +106,52 @@ var actions = []map[string]interface{}{
 			false,
 			"前田",
 		}},
-		"func": &twitter.FetchFollowersCount,
+		&twitter.FetchFollowersCount,
+	},
+	{
+		"SendRandomMeme",
+		[]string{"表情", "表情包", "随机表情", "随机表情包", "bq", "bqb", "meme"},
+		[]expand{{
+			"type",
+			"种类",
+			[]string{"种类", "类型", "偶像", "声优"},
+			[]string{},
+			false,
+			"雫",
+		}},
+		&meme.SendRandomMeme,
+	},
+	{
+		"UploadMeme",
+		[]string{"上传表情", "表情上传", "scbq"},
+		[]expand{},
+		&meme.UploadMeme,
+	},
+	{
+		"SendRandomStill",
+		[]string{"来一张"},
+		[]expand{{
+			"type",
+			"种类",
+			[]string{"种类", "类型", "偶像", "声优"},
+			[]string{},
+			false,
+			"上原步梦",
+		}},
+		&llas.RandomCard,
+	},
+	{
+		"SHIZUKU",
+		[]string{"S", "SHIZUKU", "s", "shizuku", "小雫"},
+		[]expand{{
+			"sentence",
+			"句",
+			[]string{"句", "话"},
+			[]string{},
+			true,
+			"",
+		}},
+		&shizuku.TEST,
 	},
 }
 
@@ -102,10 +169,7 @@ func schedule() {
 			return
 		}
 
-		err = SendGroupMessage(1050964896, m)
-		if err != nil {
-			log.Error().Err(err)
-		}
+		SendGroupMessage(1050964896, m)
 	})
 	if err != nil {
 		log.Error().Err(err)
@@ -118,10 +182,7 @@ func schedule() {
 			return
 		}
 
-		err = SendGroupMessage(289625710, m)
-		if err != nil {
-			log.Error().Err(err)
-		}
+		SendGroupMessage(289625710, m)
 	})
 	if err != nil {
 		log.Error().Err(err)
@@ -134,10 +195,7 @@ func schedule() {
 			return
 		}
 
-		err = SendGroupMessage(1050964896, m)
-		if err != nil {
-			log.Error().Err(err)
-		}
+		SendGroupMessage(1050964896, m)
 	})
 	if err != nil {
 		log.Error().Err(err)
@@ -152,5 +210,9 @@ func initApp() {
 
 	twitter.Timer()
 	schedule()
+	err := database.Connect()
+	if err != nil {
+		log.Error().Err(err).Msg("连接数据库时出错，请检查")
+	}
 
 }
