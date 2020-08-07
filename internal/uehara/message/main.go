@@ -3,7 +3,7 @@
 ************************************************************************************************************************
 * Basic:
 *
-*   Package Name : messagechain
+*   Package Name : message
 *   File Name    : main.go
 *   File Path    : internal/uehara/messageChain/
 *   Author       : Qianjunakasumi
@@ -11,11 +11,11 @@
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
-*   type MessageChain struct -- 存储消息信息和提供相关方法的容器
+*   type Chain struct -- 存储消息信息和提供相关方法的容器
 *
-*   func (m *MessageChain) AddText(str string)   -- 添加文本
-*   func (m *MessageChain) AddAt(target uint32)  -- 添加提醒
-*   func (m *MessageChain) AddImage(path string) -- 添加图片
+*   func (m *Chain) AddText(str string)   -- 添加文本
+*   func (m *Chain) AddAt(target uint32)  -- 添加提醒
+*   func (m *Chain) AddImage(path string) -- 添加图片
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -38,10 +38,10 @@
 *   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
-package messagechain
+package message
 
-// MessageChain 消息链
-type MessageChain struct {
+// Chain 消息链
+type Chain struct {
 	Content []map[string]interface{}
 	Cancel  bool
 }
@@ -54,7 +54,7 @@ type MessageInfo struct {
 }
 
 // AddText 插入文本
-func (m *MessageChain) AddText(str string) {
+func (m *Chain) AddText(str string) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type": "Plain",
 		"text": str,
@@ -62,7 +62,7 @@ func (m *MessageChain) AddText(str string) {
 }
 
 // AddAt 插入提醒
-func (m *MessageChain) AddAt(target uint32) {
+func (m *Chain) AddAt(target uint32) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type":    "At",
 		"target":  target,
@@ -71,7 +71,7 @@ func (m *MessageChain) AddAt(target uint32) {
 }
 
 // AddImage 插入图片
-func (m *MessageChain) AddImage(path string) {
+func (m *Chain) AddImage(path string) {
 	m.Content = append(m.Content, map[string]interface{}{
 		"type": "Image",
 		"path": "../../../../../" + path,
