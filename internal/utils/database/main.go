@@ -3,19 +3,14 @@
 ************************************************************************************************************************
 * Basic:
 *
-*   Package Name : networkware
+*   Package Name : database
 *   File Name    : main.go
-*   File Path    : pkg/networkware/
+*   File Path    : internal/utils/database/
 *   Author       : Qianjunakasumi
-*   Description  : 基本封装的网络件
+*   Description  : 数据库连接
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
-*   type Networkware struct -- 存储请求信息和提供相应方法的容器
-
-*   func (n Networkware) transport(tran **http.Transport) -- 设置代理
-*   func (n Networkware) header(req **http.Request)       -- 写入请求头部信息
-*   func (n Networkware) Send() (*http.Response, error)   -- 发送请求并返回相应
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -38,62 +33,49 @@
 *   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
-package networkware
+package database
 
 import (
-	"bytes"
-	"errors"
-	"net/http"
-	"net/url"
+	"database/sql"
+
+	"github.com/qianjunakasumi/project-shizuku/configs"
+
+	_ "github.com/go-sql-driver/mysql" // 连接数据库需要的包
+	"github.com/rs/zerolog/log"
 )
 
-// Networkware 网络件
-type Networkware struct {
-	Address string
-	Body    []byte
-	Method  string
+var DB *sql.DB
 
-	Header [][]string
-	Proxy  string
-}
+func Connect() error {
 
-func (n Networkware) transport(tran **http.Transport) {
-	if n.Proxy != "" {
-		proxy, _ := url.Parse(n.Proxy)
-		*tran = &http.Transport{
-			Proxy: http.ProxyURL(proxy),
-		}
-	}
-}
+	var err error
 
-func (n Networkware) header(req **http.Request) {
-	for i := 0; i < len(n.Header); i++ {
-		(*req).Header.Set(n.Header[i][0], n.Header[i][1])
-	}
-}
-
-// Send 发送请求
-func (n Networkware) Send() (*http.Response, error) {
-	if n.Address == "" {
-		return nil, errors.New("请求地址为空")
-	}
-
-	transport := &http.Transport{}
-	n.transport(&transport)
-	client := &http.Client{
-		Transport: transport,
-	}
-
-	req, err := http.NewRequest(n.Method, n.Address, bytes.NewBuffer(n.Body))
+	DB, err = sql.Open("mysql", configs.Conf.Databaseurl)
 	if err != nil {
-		return nil, err
-	}
-	n.header(&req)
 
-	res, err := client.Do(req)
+		return err
+
+	}
+
+	err = DB.Ping()
 	if err != nil {
-		return nil, err
+
+		return err
+
 	}
 
-	return res, nil
+	return nil
+
+}
+
+func Close() {
+
+	err := DB.Close()
+	if err != nil {
+
+		log.Error().Err(err)
+		return
+
+	}
+
 }
