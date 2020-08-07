@@ -44,7 +44,7 @@ package twitter
 import (
 	"io/ioutil"
 
-	"github.com/qianjunakasumi/project-shizuku/pkg/networkware"
+	"github.com/qianjunakasumi/project-shizuku/internal/utils/networkware"
 
 	jsoniter "github.com/json-iterator/go"
 )
