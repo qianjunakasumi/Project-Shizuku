@@ -4,7 +4,7 @@
 * Basic:
 *
 *   Package Name : twitter
-*   File Name    : fetchFollowersCount.go
+*   File Name    : followersCount.go
 *   File Path    : internal/shizuku/twitter/
 *   Author       : Qianjunakasumi
 *   Description  : 获取并解析 Twitter 粉丝数
@@ -22,8 +22,8 @@
 *     func (p *pushScheduleFollowersCount) getDatabaseData(id string) error -- 获取数据库保存的计算数据
 *     func (p *pushScheduleFollowersCount) calcTwitterFollowersData()       -- 计算输出数据
 *
-*   func fetchFollowersCount(calls map[string]string) (*messagechain.MessageChain, error) -- 处理来自 Uehara 的调用
-*   func scheduleFollowersCount(name string) (*messagechain.MessageChain, error)          -- 处理来自 定时任务函数 的调用
+*   func fetchFollowersCount(calls map[string]string) (*message.Chain, error) -- 处理来自 Uehara 的调用
+*   func scheduleFollowersCount(name string) (*message.Chain, error)          -- 处理来自 定时任务函数 的调用
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -56,7 +56,7 @@ import (
 	"time"
 
 	"github.com/qianjunakasumi/project-shizuku/configs"
-	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/message"
 
 	_ "github.com/go-sql-driver/mysql" // 连接数据库需要的包
 	"github.com/rs/zerolog/log"
@@ -101,26 +101,31 @@ func main(id string) (string, error) {
 
 	count, ok := (((res["data"].(map[string]interface{}))["user"].(map[string]interface{}))["legacy"].(map[string]interface{}))["followers_count"].(float64)
 	if !ok {
+
 		log.Error().
 			Str("返回的内容是", fmt.Sprintf("%v", res)).
 			Msg("解析错误")
 		return "", errors.New("错误")
+
 	}
 
 	return strconv.FormatFloat(count, 'f', 0, 64), nil
 
 }
 
-func fetchFollowersCount(calls map[string]string, info *messagechain.MessageInfo) (*messagechain.MessageChain, error) {
+func fetchFollowersCount(calls map[string]string, info *message.MessageInfo) (*message.Chain, error) {
 
-	m := new(messagechain.MessageChain)
-	profile := getProfile(calls["account"])
-	count, err := main(profile.followers)
+	var (
+		m          = new(message.Chain)
+		profile    = configs.Pipei(calls["account"], m, info.GroupName)
+		count, err = main(profile.Followers)
+	)
+
 	if err != nil {
 		return m, err
 	}
 
-	m.AddText("> " + profile.name + " 粉丝数：\n")
+	m.AddText("> " + profile.TwitterName + " 粉丝数：\n")
 
 	countUint, err := strconv.ParseUint(count, 10, 32)
 	wanCountUint := float64(countUint) / 10000
@@ -226,7 +231,9 @@ ORDER BY twitter_followers.date DESC`, shangyue+id)
 
 	err = db.Close()
 	if err != nil {
+
 		return err
+
 	}
 
 	return nil
@@ -235,41 +242,59 @@ ORDER BY twitter_followers.date DESC`, shangyue+id)
 
 func (p *pushScheduleFollowersCount) calcTwitterFollowersData() {
 
-	p.newFollowersCount = int32(p.todayFollowersCount) - int32(p.yesterdayFollowersCount)          // 增加的粉丝数
+	p.newFollowersCount = int32(p.todayFollowersCount) - int32(p.yesterdayFollowersCount) // 增加的粉丝数
+
 	p.toYesterdayHuanbi = float32(p.newFollowersCount) / float32(p.yesterdayFollowersCount) * 1000 // 较昨日环比
-	p.toYesterdayHuanbiRate = p.toYesterdayHuanbi - p.yesterdayHuanbiRate                          // 较昨日环比率
+
+	p.toYesterdayHuanbiRate = p.toYesterdayHuanbi - p.yesterdayHuanbiRate // 较昨日环比率
+
 	if p.yuechuFollowersCount != 0 {
+
 		p.toYuechuDingji = (float32(p.todayFollowersCount)/float32(p.yuechuFollowersCount) - 1) * 1000 // 较本月月初定基
+
 	}
 	if p.shangyueDingjiRate != 0 {
+
 		p.toShangyueDingjiRate = p.toYuechuDingji - p.shangyueDingjiRate // 较上月定基率同比
+
 	}
 
 }
 
-func scheduleFollowersCount(name string) (*messagechain.MessageChain, error) {
+func scheduleFollowersCount(name string) (*message.Chain, error) {
 
-	m := new(messagechain.MessageChain)
-	profile := getProfile(name)
-	count, err := main(profile.followers)
+	var (
+		m          = new(message.Chain)
+		profile    = configs.FuzzyGetProfile(name)
+		count, err = main(profile.Followers)
+	)
+
 	if err != nil {
+
 		return m, err
+
 	}
 
 	follwersCount, err := strconv.ParseUint(count, 10, 64)
 	if err != nil {
+
 		return m, nil
+
 	}
+
 	data := new(pushScheduleFollowersCount)
 
-	err = data.getDatabaseData(profile.id)
+	err = data.getDatabaseData(profile.ID)
 	if err != nil {
+
 		return m, err
+
 	}
+
 	data.todayFollowersCount = uint32(follwersCount)
 	data.calcTwitterFollowersData()
 
-	m.AddText("> " + profile.name + " 粉丝数数据：\n")
+	m.AddText("> " + profile.TwitterName + " 粉丝数数据：\n")
 	m.AddText("早上好！数据日报订阅详情：\n")
 	m.AddText("总数：" + count + "\n")
 	m.AddText("新增：" + strconv.FormatInt(int64(data.newFollowersCount), 10) + "\n")

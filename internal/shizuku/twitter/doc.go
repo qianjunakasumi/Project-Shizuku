@@ -14,11 +14,10 @@
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
 *   doc.go                 -- 包文档
-*   fetchFollowersCount.go -- 获取并解析 Twitter 粉丝数
-*   fetchToken.go          -- 获取 Twitter Guest Token
-*   fetchTweets.go         -- 获取并解析 Tweet
+*   followersCount.go -- 获取并解析 Twitter 粉丝数
 *   networkMiddleware.go   -- 适用于 Twitter 的网络中间件
-*   profiles.go            -- Twitter 支持帐号列表信息
+*   token.go          -- 获取 Twitter Guest Token
+*   tweets.go         -- 获取并解析 Tweet
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:

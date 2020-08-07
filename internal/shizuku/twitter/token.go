@@ -4,7 +4,7 @@
 * Basic:
 *
 *   Package Name : twitter
-*   File Name    : fetchToken.go
+*   File Name    : token.go
 *   File Path    : internal/shizuku/twitter/
 *   Author       : Qianjunakasumi
 *   Description  : 获取 Twitter Guest Token
@@ -56,7 +56,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/qianjunakasumi/project-shizuku/pkg/networkware"
+	"github.com/qianjunakasumi/project-shizuku/internal/utils/networkware"
 
 	"github.com/rs/zerolog/log"
 )

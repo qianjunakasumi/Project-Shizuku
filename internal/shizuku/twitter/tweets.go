@@ -4,7 +4,7 @@
 * Basic:
 *
 *   Package Name : twitter
-*   File Name    : fetchTweets.go
+*   File Name    : tweets.go
 *   File Path    : internal/shizuku/twitter/
 *   Author       : Qianjunakasumi
 *   Description  : 获取并解析 Tweet
@@ -26,9 +26,9 @@
 *     func (f *fetchTwitter) translateTweet()              -- 调用 百度翻译API 翻译 Tweet
 *     func (f *fetchTwitter) writeFooter()                 -- 添加 Tweet 创建时间和被喜欢次数
 *
-*   func main2(twitter *fetchTwitter, message *messagechain.MessageChain)        -- fetchTwitter 的部分封装
-*   func scheduleFetchTweets(call string) (*messagechain.MessageChain, error)    -- 处理来自 定时任务函数 的调用
-*   func fetchTweet(calls map[string]string) (*messagechain.MessageChain, error) -- 处理来自 Uehara 的调用
+*   func main2(twitter *fetchTwitter, message *message.Chain)        -- fetchTwitter 的部分封装
+*   func scheduleFetchTweets(call string) (*message.Chain, error)    -- 处理来自 定时任务函数 的调用
+*   func fetchTweet(calls map[string]string) (*message.Chain, error) -- 处理来自 Uehara 的调用
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -71,8 +71,8 @@ import (
 	"time"
 
 	"github.com/qianjunakasumi/project-shizuku/configs"
-	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
-	"github.com/qianjunakasumi/project-shizuku/pkg/networkware"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/message"
+	"github.com/qianjunakasumi/project-shizuku/internal/utils/networkware"
 
 	"github.com/rs/zerolog/log"
 )
@@ -155,8 +155,29 @@ func (f *fetchTwitter) writeHeader() {
 	// 回复
 	if replyId, ok := f.wantTweetMap["in_reply_to_status_id_str"].(string); ok {
 		f.wantTweetHeader = "回复了:" + "\n"
-		f.wantTweetText += "\n给推文:\n" + f.tweetsList[replyId].(map[string]interface{})["full_text"].(string)
+
+		a, ok := f.tweetsList[replyId].(map[string]interface{})
+		if !ok {
+
+			f.wantTweetText += "\n给推文:\n被回复的推文已经飞往火星...太过久远啦"
+			return
+
+		}
+
+		b, ok := a["full_text"].(string)
+		if !ok {
+
+			f.wantTweetText += "\n给推文:\n被回复的推文内容已经飞往火星...不见了"
+			return
+
+		}
+
+		f.wantTweetText += "\n给推文:\n" + b
 	}
+
+	/*if tes, ok := f.wantTweetMap["card"].(map[string]interface{}); ok {
+
+	}*/
 
 }
 
@@ -332,15 +353,17 @@ func (f *fetchTwitter) translateTweet() {
 // 写入脚注信息
 func (f *fetchTwitter) writeFooter() {
 
-	t, _ := time.Parse("Mon Jan 02 15:04:05 +0000 2006", f.wantTweetMap["created_at"].(string))
-	beijing, _ := time.LoadLocation("Local")
-	favoriteCount := strconv.FormatFloat(f.wantTweetMap["favorite_count"].(float64), 'f', 0, 64)
+	var (
+		t, _          = time.Parse("Mon Jan 02 15:04:05 +0000 2006", f.wantTweetMap["created_at"].(string))
+		beijing, _    = time.LoadLocation("Local")
+		favoriteCount = strconv.FormatFloat(f.wantTweetMap["favorite_count"].(float64), 'f', 0, 64)
+	)
 
 	f.wantTweetFooter = "发送时间：" + t.In(beijing).Format("01月02日 15时04分") + "\n被喜欢次数：" + favoriteCount
 
 }
 
-func main2(twitter *fetchTwitter, message *messagechain.MessageChain) {
+func main2(twitter *fetchTwitter, message *message.Chain) {
 
 	twitter.writeHeader()
 	twitter.tidyContent()
@@ -361,52 +384,62 @@ func main2(twitter *fetchTwitter, message *messagechain.MessageChain) {
 
 }
 
-func scheduleFetchTweets(call string) (*messagechain.MessageChain, error) {
+func scheduleFetchTweets(call string) (*message.Chain, error) {
 
-	m := new(messagechain.MessageChain)
-	profile := getProfile(call)
+	var (
+		m       = new(message.Chain)
+		profile = configs.FuzzyGetProfile(call)
+		x       = float64(time.Now().Hour())
+		y       = profile.Push(x)
+		r       = rand.Intn(100)
+	)
 
-	x := float64(time.Now().Hour())
-	y := profile.push(x)
-	r := rand.Intn(100)
 	if r > int(y) {
 		m.Cancel = true
 		return m, nil
 	}
 
 	fetch := new(fetchTwitter)
-	if err := fetch.main(profile.tweets, 1); err != nil {
+	if err := fetch.main(profile.Tweets, 1); err != nil {
+
 		return m, err
+
 	}
 	if err := fetch.writeTweet(0); err != nil {
+
 		return m, err
+
 	}
-	if fetch.wantTweetMap["conversation_id_str"].(string) == conversationIdList[profile.name] {
+	if fetch.wantTweetMap["conversation_id_str"].(string) == conversationIdList[profile.TwitterName] {
+
 		m.Cancel = true
 		return m, nil
+
 	}
 
-	conversationIdList[profile.name] = fetch.wantTweetMap["conversation_id_str"].(string)
-	m.AddText("推文推送服务 > " + profile.name + " 的推文：\n")
+	conversationIdList[profile.TwitterName] = fetch.wantTweetMap["conversation_id_str"].(string)
+	m.AddText("推文推送服务 > " + profile.TwitterName + " 的推文：\n")
 	main2(fetch, m)
 
 	return m, nil
 
 }
 
-func fetchTweet(calls map[string]string, info *messagechain.MessageInfo) (*messagechain.MessageChain, error) {
+func fetchTweet(calls map[string]string, info *message.MessageInfo) (*message.Chain, error) {
 
-	m := new(messagechain.MessageChain)
-	profile := getProfile(calls["account"])
+	var (
+		m             = new(message.Chain)
+		profile       = configs.Pipei(calls["account"], m, info.GroupName)
+		sequence, err = strconv.ParseUint(calls["sequence"], 10, 8)
+	)
 
-	sequence, err := strconv.ParseUint(calls["sequence"], 10, 8)
 	if err != nil {
 		return m, err
 	}
 
-	m.AddText("> " + profile.name + " 的推文：\n")
+	m.AddText("> " + profile.TwitterName + " 的推文：\n")
 	fetch := new(fetchTwitter)
-	if err := fetch.main(profile.tweets, sequence); err != nil {
+	if err := fetch.main(profile.Tweets, sequence); err != nil {
 		return m, err
 	}
 	if err := fetch.writeTweet(sequence - 1); err != nil {
