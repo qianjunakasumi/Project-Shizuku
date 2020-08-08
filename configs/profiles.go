@@ -3,9 +3,9 @@
 ************************************************************************************************************************
 * Basic:
 *
-*   Package Name : twitter
-*   File Name    : networkMiddleware.go
-*   File Path    : internal/shizuku/twitter/
+*   Package Name : configs
+*   File Name    : profiles.go
+*   File Path    : configs/
 *   Author       : Qianjunakasumi
 *   Description  : Twitter 支持帐号列表信息
 *
@@ -16,8 +16,8 @@
 *
 *   type Profiles struct -- 帐号列表信息结构
 *
-*   func GetKeys() []string              -- 获取支持的帐号的所有关键字
-*   func getProfile(str string) Profiles -- 获取指定的帐号信息
+*   func FuzzyGetProfile(str string) Profiles                        -- 模糊获取指定的帐号信息
+*   func AutoMatch(v string, m *message.Chain, name string) Profiles -- 自动模糊匹配帐号
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -40,22 +40,28 @@
 *   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
-package twitter
+package configs
 
-import "math"
+import (
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/message"
+	"math"
+	"strings"
+)
 
 // Profiles 档案
 type Profiles struct {
-	id        string
-	name      string
-	key       []string
-	followers string
-	tweets    string
-	push      func(x float64) float64
+	ID          string
+	PickName    string
+	TwitterName string
+	Key         []string
+	Followers   string
+	Tweets      string
+	Push        func(x float64) float64
 }
 
 var profiles = []Profiles{{
 	"00",
+	"ラブライブ！シリーズ公式",
 	"ラブライブ！シリーズ公式",
 	[]string{"ラブライブ", "lovelive", "官方", "LoveLive_staff"},
 	"lovelive_staff",
@@ -65,8 +71,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"01",
+	"樱坂雫",
 	"前田 佳織里",
-	[]string{"前田佳織里", "前田佳织里", "前田", "佳織里", "佳织里", "kaor1n_n", "加智力"},
+	[]string{"樱坂", "雫", "前田", "佳織里", "佳织里", "kaor1n_n", "加智力"},
 	"kaor1n_n",
 	"880621944101404672",
 	func(x float64) float64 {
@@ -74,8 +81,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"02",
+	"上原步梦",
 	"大西亜玖璃",
-	[]string{"大西亜玖璃", "大西亚玖璃", "大西", "亜玖璃", "亚玖璃", "aguri_onishi", "阿兔嘭"},
+	[]string{"上原", "步梦", "大西亜", "大西亚", "玖璃", "aguri_onishi", "阿兔嘭"},
 	"aguri_onishi",
 	"991283114885365761",
 	func(x float64) float64 {
@@ -83,8 +91,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"03",
+	"中须霞",
 	"相良 茉優",
-	[]string{"相良茉優", "相良茉优", "相良", "茉优", "MayuSgr", "麻油鸡"},
+	[]string{"相良", "茉優", "茉优", "MayuSgr", "麻油鸡"},
 	"mayusgr",
 	"1057615013282631680",
 	func(x float64) float64 {
@@ -92,8 +101,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"04",
+	"X",
 	"久保田未夢",
-	[]string{"久保田未夢", "久保田未梦", "久保田", "未夢", "未梦", "iRis_k_miyu"},
+	[]string{"久保田", "未夢", "未梦", "iRis_k_miyu"},
 	"iris_k_miyu",
 	"2384783184",
 	func(x float64) float64 {
@@ -101,8 +111,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"05",
+	"X",
 	"村上奈津実",
-	[]string{"村上奈津実", "村上奈津实", "村上", "奈津実", "奈津实", "natyaaaaaaan07"},
+	[]string{"村上", "奈津実", "奈津实", "natyaaaaaaan07"},
 	"natyaaaaaaan07",
 	"760000974005997568",
 	func(x float64) float64 {
@@ -110,8 +121,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"06",
+	"X",
 	"鬼頭明里",
-	[]string{"鬼頭明里", "鬼头明里", "鬼頭", "鬼头", "明里", "kitoakari_1016"},
+	[]string{"鬼頭", "鬼头", "明里", "kitoakari_1016"},
 	"kitoakari_1016",
 	"1141319903250534400",
 	func(x float64) float64 {
@@ -119,8 +131,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"07",
+	"X",
 	"楠木ともり",
-	[]string{"楠木ともり", "楠木灯", "楠木", "ともり", "灯", "tomori_kusunoki"},
+	[]string{"楠木", "ともり", "灯", "tomori_kusunoki"},
 	"tomori_kusunoki",
 	"847365153691582465",
 	func(x float64) float64 {
@@ -128,8 +141,9 @@ var profiles = []Profiles{{
 	},
 }, {
 	"08",
+	"X",
 	"指出 毬亜",
-	[]string{"指出毬亜", "指出毬亚", "指出", "毬亜", "毬亚", "sashide_m"},
+	[]string{"指出", "毬亜", "毬亚", "sashide_m"},
 	"sashide_m",
 	"1075210326990217216",
 	func(x float64) float64 {
@@ -137,35 +151,73 @@ var profiles = []Profiles{{
 	},
 }, {
 	"09",
+	"X",
 	"田中ちえ美",
-	[]string{"田中ちえ美", "田中千惠美", "田中", "ちえ美", "千惠美", "t_chiemi1006"},
+	[]string{"田中", "ちえ美", "千惠美", "t_chiemi1006"},
 	"t_chiemi1006",
 	"1176845285059747842",
 	func(x float64) float64 {
 		return -0.0047*math.Pow(x, 4) + 0.1544*math.Pow(x, 3) - 1.1701*math.Pow(x, 2) + 2.8274*x + 4.8613
 	},
+}, {
+	"10",
+	"三船栞子",
+	"小泉萌香",
+	[]string{"三船", "栞子", "小泉", "萌香", "萌p"},
+	"k_moeka_",
+	"4110103573",
+	func(x float64) float64 {
+		return -0.0047*math.Pow(x, 4) + 0.1544*math.Pow(x, 3) - 1.1701*math.Pow(x, 2) + 2.8274*x + 4.8613
+	},
 }}
 
-// GetKeys 获取所有关键字
-func GetKeys() []string {
-	var keys []string
+// FuzzyGetProfile 模糊获取
+func FuzzyGetProfile(str string) Profiles {
 
 	for _, v := range profiles {
-		keys = append(keys, v.key...)
-	}
 
-	return keys
-}
+		for _, v2 := range v.Key {
 
-func getProfile(str string) Profiles {
-	for _, v := range profiles {
-		for _, v2 := range v.key {
-			if v2 == str {
+			p := strings.Index(str, v2)
+			p2 := strings.Index(v2, str)
+			if p != -1 || p2 != -1 {
+
 				return v
+
 			}
+
 		}
+
 	}
 
 	var i Profiles
+
 	return i
+
+}
+
+// AutoMatch 自动匹配
+func AutoMatch(v string, m *message.Chain, name string) Profiles {
+
+	var profile Profiles
+
+	if v != "" {
+
+		profile = FuzzyGetProfile(v) // 根据传入的值匹配
+
+	} else {
+
+		profile = FuzzyGetProfile(name) // 根据群名称匹配
+
+	}
+
+	if profile.ID == "" { // 匹配失败
+
+		profile = FuzzyGetProfile("雫") // 根据机器人默认设定匹配
+		m.AddText("=== 提示：上下文缺失 ===\n\n")
+
+	}
+
+	return profile
+
 }
