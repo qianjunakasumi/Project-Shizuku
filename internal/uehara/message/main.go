@@ -13,6 +13,7 @@
 * Summary:
 *   type Chain struct -- 存储消息信息和提供相关方法的容器
 *
+*   func (m *Chain) Cancel()              -- 取消发送
 *   func (m *Chain) AddText(str string)   -- 添加文本
 *   func (m *Chain) AddAt(target uint32)  -- 添加提醒
 *   func (m *Chain) AddImage(path string) -- 添加图片
@@ -42,8 +43,8 @@ package message
 
 // Chain 消息链
 type Chain struct {
-	Content []map[string]interface{}
-	Cancel  bool
+	Content  []map[string]interface{}
+	IsCancel bool
 }
 
 type MessageInfo struct {
@@ -51,6 +52,10 @@ type MessageInfo struct {
 	UserId    uint32
 	GroupName string
 	GroupId   uint32
+}
+
+func (m *Chain) Cancel() {
+	m.IsCancel = true
 }
 
 // AddText 插入文本
