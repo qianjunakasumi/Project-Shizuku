@@ -49,7 +49,7 @@ import (
 	"strings"
 
 	"github.com/qianjunakasumi/project-shizuku/configs"
-	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/message"
 
 	"github.com/rs/zerolog/log"
 )
@@ -145,21 +145,59 @@ func writeCalls(
 
 }
 
-func handlePlain(
-	calls *[]string, msgInfo *messagechain.MessageInfo, action *action,
-) {
+func handlePlain(mainMsg map[string]interface{}, msgInfo *message.MessageInfo) {
 
 	var (
-		fields   = writeDefaults(action.expand)
-		errMsg   = writeCalls(&fields, calls, action.expand)
-		msgChain *messagechain.MessageChain
+		a       bool // 指示是否匹配到命令，若 false 则退出
+		calls   = strings.Fields(mainMsg["text"].(string))
+		calls2  []string
+		action2 = new(action)
 	)
 
-	log.Info().Msg("查询详情：" + fmt.Sprintf("%v", fields))
+	if len(calls) < 1 {
+
+		return
+
+	}
+
+	for _, v := range actions {
+
+		for _, v2 := range v.key {
+
+			if calls[0] == v2 {
+
+				a = true
+				calls2 = calls[1:]
+				*action2 = v
+
+			}
+
+		}
+
+	}
+
+	if !a {
+
+		return
+
+	}
+
+	var (
+		fields   = writeDefaults(action2.expand)
+		errMsg   = writeCalls(&fields, &calls2, action2.expand)
+		msgChain *message.Chain
+	)
+
+	log.Info().
+		Str("命令", action2.name).
+		Str("参数", fmt.Sprintf("%v", fields)).
+		Str("用户", msgInfo.UserName).
+		Str("群组", msgInfo.GroupName).
+		Msg("成功调用")
 
 	if errMsg != "" {
 
-		msgChain = new(messagechain.MessageChain)
+		msgChain = new(message.Chain)
 		msgChain.AddText(errMsg)
 
 	} else {
@@ -167,27 +205,57 @@ func handlePlain(
 		var err error
 
 		// 取出函数指针的值，执行函数
-		msgChain, err = (*(action.fun))(fields, msgInfo)
+		msgChain, err = (*(action2.fun))(fields, msgInfo)
 		if err != nil {
-			msgChain.AddText("\n执行时发生错误，调试信息：" + fmt.Sprintf("%v", err))
+
+			msgChain.AddText("\n\n=== :( 发生错误 ===\n调试信息：" + fmt.Sprintf("%v", err))
+
 		}
 
 	}
 
-	SendGroupMessage(msgInfo.GroupId, msgChain)
+	sendGroupMessage(msgInfo.GroupId, msgChain)
 
 }
 
-func handleQuote(
-	mainMsg map[string]interface{}, msgChain []interface{}, msgInfo *messagechain.MessageInfo,
-) {
+func handleImage(msgInfo *message.MessageInfo, mainMsg map[string]interface{}) {
+
+	if configs.ImageJob[msgInfo.UserId] == nil {
+
+		return
+
+	}
+
+	url := mainMsg["url"].(string)
+
+	var (
+		fun = configs.ImageJob[msgInfo.UserId]
+		m   *message.Chain
+	)
+
+	m, err := (*fun)(url, msgInfo)
+	if err != nil {
+
+		m.AddText("\n\n=== :( 发生错误 ===\n调试信息：" + fmt.Sprintf("%v", err))
+
+	}
+
+	sendGroupMessage(msgInfo.GroupId, m)
+
+}
+
+func handleQuote(mainMsg map[string]interface{}, msgChain []interface{}, msgInfo *message.MessageInfo) {
 
 	if uint32(mainMsg["senderId"].(float64)) != configs.Conf.QQNumber {
+
 		return
+
 	}
 
 	if configs.QuoteJob[msgInfo.UserId] == nil {
+
 		return
+
 	}
 
 	var text string
@@ -195,79 +263,82 @@ func handleQuote(
 	for i := 2; i < len(msgChain); i++ {
 
 		if (msgChain[i].(map[string]interface{}))["type"] == "Plain" {
+
 			text = (msgChain[i].(map[string]interface{}))["text"].(string)
+
 		}
 
 	}
 
 	if text == "" {
+
 		return
+
 	}
 
 	var (
 		fun = configs.QuoteJob[msgInfo.UserId]
-		m   *messagechain.MessageChain
+		m   *message.Chain
 	)
 
 	m, err := (*fun)(text, msgInfo)
 	if err != nil {
-		m.AddText("\n执行时发生错误，调试信息：" + fmt.Sprintf("%v", err))
+
+		m.AddText("\n\n=== :( 发生错误 ===\n调试信息：" + fmt.Sprintf("%v", err))
+
 	}
 
-	SendGroupMessage(msgInfo.GroupId, m)
+	sendGroupMessage(msgInfo.GroupId, m)
 
 }
 
 func receive(msg Message) {
 
 	if msg["type"] != "GroupMessage" {
+
 		return
+
 	}
 
 	msgChain := msg["messageChain"].([]interface{})
 
 	if len(msgChain) < 2 {
+
 		return
+
 	}
 
 	var (
 		mainMsg = msgChain[1].(map[string]interface{})
-		msgInfo = new(messagechain.MessageInfo)
+		msgInfo = &message.MessageInfo{
+			UserName:  (msg["sender"].(map[string]interface{}))["memberName"].(string),
+			UserId:    uint32((msg["sender"].(map[string]interface{}))["id"].(float64)),
+			GroupName: ((msg["sender"].(map[string]interface{}))["group"].(map[string]interface{}))["name"].(string),
+			GroupId:   uint32(((msg["sender"].(map[string]interface{}))["group"].(map[string]interface{}))["id"].(float64)),
+		}
 	)
 
-	msgInfo.UserId = uint32((msg["sender"].(map[string]interface{}))["id"].(float64))
-	msgInfo.UserName = (msg["sender"].(map[string]interface{}))["memberName"].(string)
-	msgInfo.GroupId = uint32(((msg["sender"].(map[string]interface{}))["group"].(map[string]interface{}))["id"].(float64))
-	msgInfo.GroupName = ((msg["sender"].(map[string]interface{}))["group"].(map[string]interface{}))["name"].(string)
+	// 若匿名用户则禁止
+	if msgInfo.UserId == 80000000 {
+
+		return
+
+	}
 
 	switch mainMsg["type"] {
 
 	case "Plain":
 
-		calls := strings.Fields(mainMsg["text"].(string))
-		if len(calls) < 1 {
-			return
-		}
-
-		for _, v := range actions {
-
-			for _, v2 := range v.key {
-
-				if calls[0] == v2 {
-
-					calls2 := calls[1:]
-					handlePlain(&calls2, msgInfo, &v)
-
-				}
-
-			}
-
-		}
+		handlePlain(mainMsg, msgInfo)
 
 	case "Image":
 
+		handleImage(msgInfo, mainMsg)
+
 	case "Quote":
+
 		handleQuote(mainMsg, msgChain, msgInfo)
+
 	}
 
 }
@@ -276,13 +347,19 @@ func receive(msg Message) {
 func Connect() error {
 
 	if err := auth(); err != nil {
+
 		return err
+
 	}
 	if err := verify(); err != nil {
+
 		return err
+
 	}
 	if err := listen(); err != nil {
+
 		return err
+
 	}
 
 	initApp()
