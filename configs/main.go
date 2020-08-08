@@ -4,7 +4,7 @@
 * Basic:
 *
 *   Package Name : configs
-*   File Name    : shizuku.go
+*   File Name    : main.go
 *   File Path    : configs/
 *   Author       : Qianjunakasumi
 *   Description  : 解析 SHIZUKU 配置参数
@@ -44,7 +44,6 @@ import (
 
 // conf configs.yml结构
 type conf struct {
-	Development      bool   // 开发模式
 	QQNumber         uint32 // Robot QQ号
 	MiraiAddress     string // Mirai API HTTP URL地址
 	MiraiAuthKey     string // Mirai API HTTP AuthKey
@@ -65,12 +64,16 @@ func SetConfigs() error {
 
 	file, err := ioutil.ReadFile("configs/configs.yml")
 	if err != nil {
+
 		return err
+
 	}
 
 	err = yaml.Unmarshal(file, &Conf)
 	if err != nil {
+
 		return err
+
 	}
 
 	return nil
