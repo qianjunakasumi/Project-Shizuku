@@ -53,8 +53,11 @@ func main() {
 
 	err := configs.SetConfigs()
 	if err != nil {
-		log.Fatal().Msg("加载配置文件时出现错误")
+
+		log.Fatal().Msg("加载配置文件时发生错误，请检查")
+
 		return
+
 	}
 
 	log.Info().Msg("Copyright (C) 2020-present  QianjuNakasumi  AGPL-3.0 License | Release version：" +
@@ -63,10 +66,11 @@ func main() {
 		configs.BuildTime)
 
 	if err := shizuku.Start(); err != nil {
-		log.Fatal().Msg(fmt.Sprintf("%v", err))
+		log.Fatal().Msg("启动 SHIZUKU 失败：" + fmt.Sprintf("%v", err))
 	}
 	log.Info().
-		Msg("启动SHIZUKU完毕")
+		Msg("成功启动 SHIZUKU 应用")
 
 	select {}
+
 }
