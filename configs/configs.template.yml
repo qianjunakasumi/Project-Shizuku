@@ -1,5 +1,3 @@
-development: false # 开发者模式
-
 qqnumber: 您的QQ号
 miraiaddress: 127.0.0.1:7958 # Mirai HTTP API 地址
 miraiauthkey: LOVELIVENIJIGASAKISCHOOLIDOL&NIJIGASAKIMIRAINIJI-PRODUCT # Mirai HTTP API 设置的 Key
