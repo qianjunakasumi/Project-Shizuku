@@ -11,7 +11,7 @@
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
-*   func Start() error -- 启动 UEHARA 连接
+*   func Start() error -- 启动 UEHARA 连接，初始化应用信息
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -36,14 +36,18 @@
 
 package shizuku
 
-import (
-	"github.com/qianjunakasumi/project-shizuku/internal/uehara"
-)
+import "github.com/qianjunakasumi/project-shizuku/internal/uehara"
 
 func Start() error {
+
 	if err := uehara.Connect(); err != nil {
+
 		return err
+
 	}
 
+	uehara.InitApp()
+
 	return nil
+
 }
