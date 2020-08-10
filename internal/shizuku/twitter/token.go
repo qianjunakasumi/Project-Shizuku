@@ -67,12 +67,13 @@ func isRealToken(t string) bool {
 
 	_, err := strconv.ParseUint(t, 10, 64)
 	if err != nil {
+
 		log.Error().
-			Str("包名", "twitter").
-			Str("函数", "isRealToken").
 			Str("Token", t).
 			Msg("校验 Token 结果失败")
+
 		return false
+
 	}
 
 	return true
@@ -82,9 +83,8 @@ func isRealToken(t string) bool {
 func writeToken(t string) {
 
 	token = t
+
 	log.Info().
-		Str("包名", "twitter").
-		Str("函数", "fetchToken").
 		Str("Token", t).
 		Msg("成功获取 Token")
 
@@ -102,19 +102,26 @@ func (e extractToken) extractToken(res *http.Response) {
 
 	cont, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+
 		log.Error().
-			Str("包名", "twitter").
-			Str("函数", "fetchToken").
-			Err(err)
+			Err(err).
+			Msg("提取 Token 时发生错误")
+
 		return
+
 	}
 
-	p := bytes.LastIndex(cont, []byte("document.cookie = decodeURIComponent"))
-	token := string(cont)[p+41 : p+60]
+	var (
+		p     = bytes.LastIndex(cont, []byte("document.cookie = decodeURIComponent"))
+		token = string(cont)[p+41 : p+60]
+	)
 
 	if isRealToken(token) {
+
 		writeToken(token)
+
 		return
+
 	}
 
 	e.next.extractToken(res)
@@ -127,28 +134,33 @@ type extractToken2 struct {
 
 func (e extractToken2) extractToken(res *http.Response) {
 
-	tokenContent := res.Header["Set-Cookie"][0]
-	p := bytes.IndexAny([]byte(tokenContent), "gt=") + 3
+	var (
+		tokenContent = res.Header["Set-Cookie"][0]
+		p            = bytes.IndexAny([]byte(tokenContent), "gt=") + 3
+	)
+
 	if p == -1 {
+
 		log.Error().
-			Str("包名", "twitter").
-			Str("函数", "fetchToken2").
-			Msg("定位 Token 时出现错误")
+			Msg("定位 Token 时发生错误")
+
 		return
+
 	}
 
 	token := tokenContent[p : p+19]
 
 	if isRealToken(token) {
+
 		writeToken(token)
+
 		return
+
 	}
 
 	log.Error().
-		Str("包名", "twitter").
-		Str("函数", "fetchToken2").
 		Str("Token", token).
-		Msg("责任链运行失败：提取 Token 失败")
+		Msg("提取 Token 时发生错误")
 
 }
 
@@ -168,8 +180,10 @@ func FetchToken() {
 		return
 	}
 
-	ext := new(extractToken)
-	ext2 := new(extractToken2)
+	var (
+		ext  = new(extractToken)
+		ext2 = new(extractToken2)
+	)
 
 	ext.next = ext2
 
@@ -181,10 +195,15 @@ func FetchToken() {
 func Timer() {
 
 	FetchToken()
+
 	go func() {
+
 		for range time.Tick(time.Hour) {
+
 			FetchToken()
+
 		}
+
 	}()
 
 }
