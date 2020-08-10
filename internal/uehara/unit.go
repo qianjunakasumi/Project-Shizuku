@@ -14,12 +14,12 @@
 *   Variables:
 *     session -- 令牌
 *
-*   func code(code float64) error                                                  -- 状态码解析
-*   func auth() error                                                              -- 认证 Session
-*   func verify() error                                                            -- 验证 Session
-*   func Release() error                                                           -- 释放 Session
-*   func listen() error                                                            -- 监听 WebSocket 消息
-*   func SendGroupMessage(target uint32, message *messagechain.MessageChain) error -- 发送群消息
+*   func code(code float64) error                     -- 状态码解析
+*   func auth() error                                 -- 认证 Session
+*   func verify() error                               -- 验证 Session
+*   func Release() error                              -- 释放 Session
+*   func listen() error                               -- 监听 WebSocket 消息
+*   func sendGroupMessage(t uint64, m *message.Chain) -- 发送群消息
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -46,9 +46,11 @@ package uehara
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 
 	"github.com/qianjunakasumi/project-shizuku/configs"
-	"github.com/qianjunakasumi/project-shizuku/internal/uehara/messagechain"
+	"github.com/qianjunakasumi/project-shizuku/internal/uehara/message"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/websocket"
@@ -56,16 +58,28 @@ import (
 
 var session string
 
-func code(code float64) error {
+func code(c float64) error {
 
-	if code == 0 {
-		return nil
+	list := map[float64]string{
+		1:   "Auth Key 错误",
+		2:   "Bot 不存在",
+		3:   "Session 失效或不存在",
+		4:   "Session 未激活",
+		5:   "发送目标不存在",
+		6:   "图片文件不存在",
+		10:  "无此权限",
+		20:  "禁言状态",
+		30:  "消息过长",
+		400: "参数错误",
 	}
 
-	log.Error().
-		Float64("状态码", code).
-		Msg("发送消息失败")
-	return errors.New("code不为0")
+	if c == 0 {
+
+		return nil
+
+	}
+
+	return errors.New(list[c])
 
 }
 
@@ -75,12 +89,17 @@ func auth() error {
 		"authKey": configs.Conf.MiraiAuthKey,
 	})
 	if err != nil {
+
 		return err
+
 	}
 
 	if err = code(res["code"].(float64)); err != nil {
+
 		return err
+
 	}
+
 	session = res["session"].(string)
 
 	return nil
@@ -93,11 +112,15 @@ func verify() error {
 		"qq":         configs.Conf.QQNumber,
 	})
 	if err != nil {
+
 		return err
+
 	}
 
 	if err = code(res["code"].(float64)); err != nil {
+
 		return err
+
 	}
 
 	return nil
@@ -112,11 +135,15 @@ func Release() error {
 		"qq":         configs.Conf.QQNumber,
 	})
 	if err != nil {
+
 		return err
+
 	}
 
 	if err = code(res["code"].(float64)); err != nil {
+
 		return err
+
 	}
 
 	return nil
@@ -127,44 +154,74 @@ func listen() error {
 
 	ws, err := websocket.Dial("ws://"+configs.Conf.MiraiAddress+"/message?sessionKey="+session, "", "http://localhost/")
 	if err != nil {
+
 		return err
+
 	}
 
 	go func() {
+
 		for {
+
 			msg := make(Message)
 
 			if err := websocket.JSON.Receive(ws, &msg); err != nil {
+
+				log.Error().
+					Err(err).
+					Msg("接收 Websocket 消息时发生错误")
+
 				return
+
 			}
+
 			receive(msg)
+
 		}
+
 	}()
 
 	return nil
 
 }
 
-// SendGroupMessage 发送群消息
-func SendGroupMessage(target uint32, message *messagechain.MessageChain) error {
+// sendGroupMessage 发送群消息
+func sendGroupMessage(t uint64, m *message.Chain) {
 
-	if message.Cancel {
-		return nil
+	if m.IsCancel {
+
+		return
+
 	}
 
 	res, err := post("sendGroupMessage", Content{
 		"sessionKey":   session,
-		"target":       target,
-		"messageChain": message.Content,
+		"target":       t,
+		"messageChain": m.Content,
 	})
 	if err != nil {
-		return err
+
+		log.Error().Err(err)
+
+		return
+
 	}
 
 	if err = code(res["code"].(float64)); err != nil {
-		return err
+
+		log.Error().
+			Err(err).
+			Str("群号", strconv.FormatUint(t, 10)).
+			Str("消息", fmt.Sprintf("%v", m.Content)).
+			Msg("发送消息失败")
+
+		return
+
 	}
 
-	return nil
+	log.Info().
+		Str("群号", strconv.FormatUint(t, 10)).
+		Str("消息", fmt.Sprintf("%v", m.Content)).
+		Msg("发送消息成功")
 
 }
