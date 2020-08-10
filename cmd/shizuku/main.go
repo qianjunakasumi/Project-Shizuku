@@ -49,12 +49,22 @@ import (
 
 func main() {
 
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "01-02|15:04:05"})
+	writer := zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "01-02|15:04:05"}
+	writer.FormatCaller = func(i interface{}) string {
+
+		return fmt.Sprintf("\x1b[1m%v\x1b[0m \x1b[36m>\x1b[0m", i.(string)[34:])
+
+	}
+
+	log.Logger = log.Output(writer).
+		With().Caller().Logger()
 
 	err := configs.SetConfigs()
 	if err != nil {
 
-		log.Fatal().Msg("加载配置文件时发生错误，请检查")
+		log.Fatal().
+			Err(err).
+			Msg("加载配置文件时发生错误")
 
 		return
 
@@ -66,10 +76,12 @@ func main() {
 		configs.BuildTime)
 
 	if err := shizuku.Start(); err != nil {
+
 		log.Fatal().Msg("启动 SHIZUKU 失败：" + fmt.Sprintf("%v", err))
+
 	}
-	log.Info().
-		Msg("成功启动 SHIZUKU 应用")
+
+	log.Info().Msg("成功启动 SHIZUKU 应用")
 
 	select {}
 
