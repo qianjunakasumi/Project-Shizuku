@@ -11,7 +11,15 @@
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
-*   待完善
+*   Variables:
+*     Conf      -- 程序配置
+*     Version   -- 版本号
+*     BuildTime -- 编译日期时间
+*     CommitId  -- 提交的短ID
+*
+*   type conf struct -- configs.yml 结构化
+*
+*   func SetConfigs() error -- 读取配置文件载入程序配置
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -53,13 +61,13 @@ type conf struct {
 }
 
 var (
-	Conf      conf      // 配置文件
-	Version   = "1.0.0" // 版本
-	BuildTime string    // 编译时的日期和时间
-	CommitId  string    // 存储库最新提交的短SHA1
+	Conf      conf      // 程序配置
+	Version   = "1.0.0" // 版本号
+	BuildTime string    // 编译日期时间
+	CommitId  string    // 提交的短ID
 )
 
-// SetConfigs 配置配置参数
+// SetConfigs 读取配置文件载入程序配置
 func SetConfigs() error {
 
 	file, err := ioutil.ReadFile("configs/configs.yml")
