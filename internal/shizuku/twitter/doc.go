@@ -1,4 +1,4 @@
-/* Package twitter
+/* Package twitter 包文档
 
 ************************************************************************************************************************
 ***  P R O J E C T  --  S H I Z U K U                                                   Q I A N J U N A K A S U M I  ***
@@ -13,11 +13,11 @@
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Summary:
-*   doc.go                 -- 包文档
-*   followersCount.go -- 获取并解析 Twitter 粉丝数
-*   networkMiddleware.go   -- 适用于 Twitter 的网络中间件
-*   token.go          -- 获取 Twitter Guest Token
-*   tweets.go         -- 获取并解析 Tweet
+*   doc.go               -- 包文档
+*   followersCount.go    -- 获取并解析 Twitter 粉丝数
+*   networkMiddleware.go -- 适用于 Twitter 的网络中间件
+*   token.go             -- 获取 Twitter Guest Token
+*   tweets.go            -- 获取并解析 Tweet
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
