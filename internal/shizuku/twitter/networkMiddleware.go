@@ -55,6 +55,7 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 type Content map[string]interface{}
 
 func get(address string) (Content, error) {
+
 	req := new(networkware.Networkware)
 	req.Address = "https://api.twitter.com/" + address
 	req.Method = "GET"
@@ -64,20 +65,28 @@ func get(address string) (Content, error) {
 		{"x-guest-token", token},
 	}
 	req.Proxy = "http://127.0.0.1:10809"
+
 	res, err := req.Send()
 	if err != nil {
+
 		return nil, err
+
 	}
 
 	defer res.Body.Close()
 	cont, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+
 		return nil, err
+
 	}
 
 	content := make(map[string]interface{})
 	if err = json.Unmarshal(cont, &content); err != nil {
+
 		return nil, err
+
 	}
+
 	return content, nil
 }
