@@ -34,12 +34,13 @@ package kasumi
 
 import (
 	"bytes"
+	"errors"
 	"net/http"
 	"net/url"
 
 	"github.com/qianjunakasumi/project-shizuku/internal/utils/json"
 
-	"github.com/qianjunakasumi/project-shizuku/configs"
+	"github.com/rs/zerolog/log"
 )
 
 // C 内容
@@ -53,6 +54,7 @@ Addr 和 Method 是必填字段
 当上述字段留空时返回空指针，请谨慎使用
 */
 type Request struct {
+	Host      string     // 主机
 	Addr      string     // 地址
 	Body      C          // 内容
 	Method    string     // 模式
@@ -124,11 +126,20 @@ func (n Network) send(c chan *http.Response) {
 	var (
 		client, err = n.setClient()
 		b           []byte
+		res         *http.Response
 	)
+
+	// 避免 deadlock 产生 panic ，注意可能 nil
+	defer func() {
+
+		c <- res
+
+	}()
 
 	if err != nil {
 
-		// hanld
+		log.Error().Err(err).Msg("设置客户端出错")
+
 		return
 
 	}
@@ -137,6 +148,8 @@ func (n Network) send(c chan *http.Response) {
 
 		b, err = json.JSON.Marshal(&n.Body)
 		if err != nil {
+
+			log.Error().Err(err).Msg("转换 JSON 出错")
 
 			return
 
@@ -147,27 +160,29 @@ func (n Network) send(c chan *http.Response) {
 	req, err := http.NewRequest(n.Method, n.Addr, bytes.NewBuffer(b))
 	if err != nil {
 
+		log.Error().Err(err).Msg("新建请求出错")
+
 		return
 
 	}
 
 	n.setHeader(req)
 
-	res, err := client.Do(req)
+	res, err = client.Do(req)
 	if err != nil {
+
+		log.Error().Err(err).Msg("返回错误")
 
 		return
 
 	}
-
-	c <- res
 
 }
 
 // MiraiReq 适用于 MiraiReq 的网络请求
 func (n *Network) MiraiReq() (C, error) {
 
-	n.Addr = "http://" + configs.Conf.MiraiAddress + "/" + n.Addr
+	n.Addr = "http://" + n.Host + "/" + n.Addr
 	n.Header = [][]string{
 		{"Content-Type", "application/json; charset=utf-8"},
 	}
@@ -177,6 +192,11 @@ func (n *Network) MiraiReq() (C, error) {
 	go n.send(c)
 
 	res := <-c
+	if res == nil {
+
+		return nil, errors.New("网络请求失败")
+
+	}
 
 	defer res.Body.Close()
 
