@@ -19,9 +19,11 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 **本产品许可证遵循 [Mirai 许可证](https://github.com/mamoe/mirai#%E8%AE%B8%E5%8F%AF%E8%AF%81) 并受其约束，您必须遵守本产品和 Mirai 的约束**
 
-## **注意！Attention!**
+# 警告！Attention!
 
-产品底层正在重构中，任何API不再稳定！
+### 产品正在计划弃用 Mirai ，转由 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 提供
+
+### 底层正在重构中，任何API不再稳定！
 
 ### 支持的功能
 
@@ -49,6 +51,18 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
     - 上传表情
 
 ... 更多您期待的功能欢迎您通过“贡献“向我们反馈！
+
+
+## 我们在使用
+
+![虹咲学园未来彩虹同好会 289625710](https://s1.ax1x.com/2020/08/18/duNsUJ.jpg)
+![樱坂雫の水滴团 1050964896](https://s1.ax1x.com/2020/08/18/du19eA.jpg)
+![上原步梦火星团 296973163](https://s1.ax1x.com/2020/08/18/du1Pot.jpg)
+
+
+## 案例
+
+千橘雫雫@QianjuNana 是 Project SHIZUKU 官方提供的机器人服务
 
 ## 贡献
 
