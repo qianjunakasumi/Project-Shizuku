@@ -16,8 +16,8 @@
 
 # SHIZUKU
 .idea/
-.tmp.drivedownload/
 configs/configs.yml
-third_party/
+assets/audio/
+assets/game/
 assets/images/
 *.lnk
