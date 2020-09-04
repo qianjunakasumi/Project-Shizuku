@@ -33,6 +33,7 @@
 package shizuku
 
 import (
+	"io/ioutil"
 	"time"
 
 	"github.com/Mrs4s/MiraiGo/client"
@@ -42,12 +43,13 @@ import (
 
 // Rina Rina // TODO 更多
 type Rina struct {
-	c *client.QQClient // 客户端
+	c       *client.QQClient // 客户端
+	msgChan *chan *QQMsg     // 消息管道
 }
 
 // QQMsg 接收的 QQ 消息
 type QQMsg struct {
-	Type  string
+	Type  *Idol
 	Chain []Chain // 消息链
 	Call  map[string]string
 	Group struct {
@@ -70,12 +72,12 @@ type Chain struct {
 
 // Message 返回的 QQ 消息
 type Message struct {
-	ID uint64 // 群号
-	m2.SendingMessage
+	target uint64            // 目标
+	chain  m2.SendingMessage // 消息链
 }
 
 // newRina 新增 Rina
-func newRina(i uint64, p string) (r *Rina) {
+func newRina(i uint64, p string, ch *chan *QQMsg) (r *Rina) {
 
 	err := client.SystemDeviceInfo.ReadJson([]byte("{\"display\":\"MIRAI.666470.001\",\"product\":\"mirai\",\"device\":\"mirai\",\"board\":\"mirai\",\"model\":\"mirai\",\"finger_print\":\"mamoe/mirai/mirai:10/MIRAI.200122.001/5696651:user/release-keys\",\"boot_id\":\"58fe8ac7-4de7-71ec-073d-07eb3187a533\",\"proc_version\":\"Linux version 3.0.31-HxHC3WtY (android-build@xxx.xxx.xxx.xxx.com)\",\"imei\":\"351912693210254\"}"))
 	if err != nil {
@@ -94,7 +96,7 @@ func newRina(i uint64, p string) (r *Rina) {
 		}
 	})
 
-	r = &Rina{c: c}
+	r = &Rina{c: c, msgChan: ch}
 	if err := r.login(); err != nil {
 		log.Panic().Msg("登录失败")
 	}
@@ -156,9 +158,10 @@ func (r Rina) regEventHandle() {
 
 }
 
-func (r Rina) onGroupMsg(q *client.QQClient, m *m2.GroupMessage) {
+func (r Rina) onGroupMsg(_ *client.QQClient, m *m2.GroupMessage) {
 
 	msg := &QQMsg{
+		Type:  FuzzyGetIdol(m.GroupName),
 		Chain: []Chain{},
 		Group: struct {
 			ID   uint64
@@ -205,13 +208,83 @@ func (r Rina) onGroupMsg(q *client.QQClient, m *m2.GroupMessage) {
 		Interface("原文", msg.Chain).
 		Msg("收到群消息")
 
-	// TODO 传消息到 SHIZUKU 接收模块
+	*r.msgChan <- msg
 }
 
-func (r Rina) SendGroupMsg(i uint64, m *Message) {
+// NewMsg 新建消息结构体
+func NewMsg() *Message { return &Message{chain: m2.SendingMessage{}} }
 
-	msg := &m2.SendingMessage{}
-	//msg.Append(m2.NewText("测试发送消息"))
+// NewText 新建文本消息结构体
+func NewText(t string) *Message { m := &Message{chain: m2.SendingMessage{}}; return m.AddText(t) }
 
-	r.c.SendGroupMessage(int64(i), msg)
+// NewImage 新建图片消息结构体
+func NewImage(p string) *Message { m := &Message{chain: m2.SendingMessage{}}; return m.AddImage(p) }
+
+// NewAudio 新建音频消息结构体
+func NewAudio(p string) *Message { m := &Message{chain: m2.SendingMessage{}}; return m.AddAudio(p) }
+
+// AddText 添加文本
+func (m *Message) AddText(t string) *Message { m.chain.Append(m2.NewText(t)); return m }
+
+// AddImage 添加图片
+func (m *Message) AddImage(p string) *Message {
+
+	b, err := ioutil.ReadFile(p)
+	if err != nil {
+		log.Error().Err(err).Msg("读取图片失败")
+		return m
+	}
+
+	m.chain.Append(m2.NewImage(b))
+
+	return m
+
+}
+
+// AddAudio 添加音频
+func (m *Message) AddAudio(p string) *Message {
+
+	b, err := ioutil.ReadFile(p)
+	if err != nil {
+		log.Error().Err(err).Msg("读取语音失败")
+		return m
+	}
+
+	m.chain.Append(&m2.VoiceElement{Data: b})
+
+	return m
+
+}
+
+// To 发送的目标
+func (m *Message) To(i uint64) *Message { m.target = i; return m }
+
+// SendGroupMsg 发送群消息
+func (r Rina) SendGroupMsg(m *Message) {
+
+	for k, v := range m.chain.Elements {
+		if nm, ok := v.(*m2.ImageElement); ok {
+			am, err := r.c.UploadGroupImage(int64(m.target), nm.Data)
+			if err != nil {
+				log.Error().Err(err).Msg("上传图片失败")
+			} else {
+				m.chain.Elements[k] = am
+			}
+
+		}
+
+		if nm, ok := v.(*m2.VoiceElement); ok {
+			am, err := r.c.UploadGroupPtt(int64(m.target), nm.Data)
+			if err != nil {
+				log.Error().Err(err).Msg("上传语音失败")
+			} else {
+				m.chain.Elements[k] = am
+			}
+		}
+	}
+
+	log.Info().Msg("发送群消息")
+
+	r.c.SendGroupMessage(int64(m.target), &m.chain)
+
 }
