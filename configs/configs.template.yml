@@ -1,8 +1,7 @@
-qqnumber: 您的QQ号
-miraiaddress: 127.0.0.1:7958 # Mirai HTTP API 地址
-miraiauthkey: LOVELIVENIJIGASAKISCHOOLIDOL&NIJIGASAKIMIRAINIJI-PRODUCT # Mirai HTTP API 设置的 Key
+qqID: QQ号
+qqPassword: QQ密码
 
-databaseurl: 您的数据库地址
+databaseURL: 数据库地< 帐号:密码@tcp(IP地址)/数据库名 >
 
-translationappid: 您的百度翻译APPID
-translationkey: 您的百度翻译密钥
+translationAppid: 百度翻译 AppID
+translationKey: 百度翻译密钥
