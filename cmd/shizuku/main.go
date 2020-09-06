@@ -7,11 +7,7 @@
 *   File Name    : main.go
 *   File Path    : cmd/shizuku/
 *   Author       : Qianjunakasumi
-*   Description  : 程序主入口，启动 SHIZUKU 应用
-*
-*----------------------------------------------------------------------------------------------------------------------*
-* Summary:
-*   func main() -- 设置全局 LOG 样式，加载配置文件，启动 SHIZUKU 应用
+*   Description  : 程序入点
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -37,52 +33,48 @@
 package main
 
 import (
-	"fmt"
+	"bufio"
 	"os"
 
-	"github.com/qianjunakasumi/project-shizuku/configs"
+	_ "github.com/qianjunakasumi/project-shizuku/cmd/shizuku/basic" // 全局初始化
 	"github.com/qianjunakasumi/project-shizuku/internal/shizuku"
 
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	_ "github.com/qianjunakasumi/project-shizuku/internal/app/debug"     // 调试 应用
+	_ "github.com/qianjunakasumi/project-shizuku/internal/app/guesssong" // 阅词识曲 应用
+	_ "github.com/qianjunakasumi/project-shizuku/internal/app/llas"      // 来一张场景 应用
+	_ "github.com/qianjunakasumi/project-shizuku/internal/app/meme"      // 表情 应用
+	_ "github.com/qianjunakasumi/project-shizuku/internal/app/menu"      // 菜单 应用
+	_ "github.com/qianjunakasumi/project-shizuku/internal/app/shizuku"   // 小雫 应用
+	_ "github.com/qianjunakasumi/project-shizuku/internal/app/twitter"   // Twitter 应用
 )
 
 func main() {
 
-	writer := zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "01-02|15:04:05"}
-	writer.FormatCaller = func(i interface{}) string {
+	shizuku.New()
 
-		return fmt.Sprintf("\x1b[1m%v\x1b[0m \x1b[36m>\x1b[0m", i.(string)[34:])
+	// 调试程序使用
+	/*go func() {
+		log.Error().Err(http.ListenAndServe(":520", nil)).Msg("步梦")
+	}()*/
 
-	}
+	sc := bufio.NewScanner(os.Stdin)
+	for sc.Scan() {
 
-	log.Logger = log.Output(writer).
-		With().Caller().Logger()
+		t := sc.Text()
+		switch t {
+		case "bye":
 
-	err := configs.SetConfigs()
-	if err != nil {
+			log.Info().Msg("谢谢您的使用，下次再见")
+			os.Exit(2)
 
-		log.Fatal().
-			Err(err).
-			Msg("加载配置文件时发生错误")
+		default:
 
-		return
+			log.Warn().Msg("您的输入有误，请检查")
 
-	}
-
-	log.Info().Msg("Copyright (C) 2020-present  QianjuNakasumi  AGPL-3.0 License | Release version：" +
-		configs.Version + "+" +
-		configs.CommitId + "." +
-		configs.BuildTime)
-
-	if err := shizuku.Start(); err != nil {
-
-		log.Fatal().Msg("启动 SHIZUKU 失败：" + fmt.Sprintf("%v", err))
+		}
 
 	}
-
-	log.Info().Msg("成功启动 SHIZUKU 应用")
-
-	select {}
 
 }
