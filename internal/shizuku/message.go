@@ -127,8 +127,8 @@ func (s *SHIZUKU) processCommand(m *QQMsg) (*Message, error) {
 				return NewText(err), nil
 			}
 
-			log.Info().Interface("数据", c).Msg("请求")
 			m.Call = c
+			log.Info().Interface("数据", m.Call).Msg("命令请求")
 
 			r, err2 := v.Pointer.OnCall(m, s)
 			if err2 != nil {
