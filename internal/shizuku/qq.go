@@ -64,7 +64,7 @@ type QQMsg struct {
 
 // Chain 消息链
 type Chain struct {
-	Type string // 类型
+	Type string // 类型：text、image、at
 	Text string // text
 	URL  string // image
 	QQ   uint64 // at
@@ -203,8 +203,9 @@ func (r Rina) onGroupMsg(_ *client.QQClient, m *m2.GroupMessage) {
 	}
 
 	log.Info().
-		Str("群名", m.GroupName).Int64("群号", m.GroupCode).
-		Str("昵称", m.Sender.DisplayName()).Int64("QQ", m.Sender.Uin).
+		Interface("群类型", msg.Type.PickName).
+		Str("群名", msg.Group.Name).
+		Str("昵称", msg.User.Name).
 		Interface("原文", msg.Chain).
 		Msg("收到群消息")
 
