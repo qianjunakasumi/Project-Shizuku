@@ -33,12 +33,8 @@
 package llas
 
 import (
-	"crypto/rand"
-	"io/ioutil"
-	"math/big"
-
+	"github.com/qianjunakasumi/project-shizuku/internal/app/utils"
 	"github.com/qianjunakasumi/project-shizuku/internal/shizuku"
-	"github.com/rs/zerolog/log"
 )
 
 type randomStill struct {
@@ -51,29 +47,12 @@ func (r randomStill) OnCall(qm *shizuku.QQMsg, _ *shizuku.SHIZUKU) (rm *shizuku.
 		qm.Type = shizuku.FuzzyGetIdol(c)
 	}
 
-	dirPath := r.root + qm.Type.ID + "/stills/"
-	files, err := ioutil.ReadDir(dirPath)
-	if err != nil {
-		log.Error().Err(err).Msg("找不到对应文件夹")
-		return
-	}
-
-	allStills := make([]string, 0)
-	for _, v := range files {
-		allStills = append(allStills, v.Name())
-	}
-
-	if len(allStills) == 0 {
-		shizuku.NewText("啊哦，您请求的「" + qm.Type.PickName + "」场景飞往火星了...")
-		return
-	}
-
-	randomInt, err := rand.Int(rand.Reader, big.NewInt(int64(len(allStills))))
+	still, err := utils.GetFileNameByDir(r.root + qm.Type.ID + "/stills/")
 	if err != nil {
 		return
 	}
 
-	rm = shizuku.NewImage(dirPath + allStills[randomInt.Uint64()])
+	rm = shizuku.NewImage(still)
 	return
 
 }
