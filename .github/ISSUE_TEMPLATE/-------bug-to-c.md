@@ -2,7 +2,7 @@
 name: 功能缺陷报告（BUG）To C
 about: 适用于 C 的功能缺陷报告（To C）
 title: ''
-labels: 客户侧, 讨论
+labels: 用户侧, 讨论
 assignees: qianjunakasumi
 
 ---
