@@ -21,9 +21,8 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 # 警告！Attention!
 
-### 产品正在计划弃用 Mirai ，转由 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 提供
-
-### 底层正在重构中，任何API不再稳定！
+## 产品已弃用 Mirai ，由 MiraiGO 提供，开发仍在进行中
+底层正在重构中，主分支不可用
 
 ### 支持的功能
 
