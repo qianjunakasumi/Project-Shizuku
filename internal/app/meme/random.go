@@ -3,11 +3,11 @@
 ************************************************************************************************************************
 * Basic:
 *
-*   Package Name : ayumu
-*   File Name    : main.go
-*   File Path    : internal/ayumu/
+*   Package Name : meme
+*   File Name    : random.go
+*   File Path    : internal/app/meme/
 *   Author       : Qianjunakasumi
-*   Description  : AYUMU 基础结构
+*   Description  : 随机表情
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -30,23 +30,29 @@
 *   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
-package ayumu
+package meme
 
 import (
-	"golang.org/x/net/websocket"
+	"github.com/qianjunakasumi/project-shizuku/internal/app/utils"
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku"
 )
 
-type Ayumu struct {
-	wsAddr string          // Websocket 地址
-	ws     *websocket.Conn // Websocket 会话
-	Exit   chan uint8      // 退出信号
+type randomMeme struct {
+	root string
 }
 
-// New 新建一个 AYUMU
-func New(addr string) *Ayumu {
+func (r randomMeme) OnCall(qm *shizuku.QQMsg, _ *shizuku.SHIZUKU) (rm *shizuku.Message, err error) {
 
-	return &Ayumu{
-		wsAddr: addr,
+	if c := qm.Call["idol"]; c != "_SHIZUKU默认检查专用" {
+		qm.Type = shizuku.FuzzyGetIdol(c)
 	}
+
+	meme, err := utils.GetFileNameByDir(r.root + qm.Type.ID + "/")
+	if err != nil {
+		return
+	}
+
+	rm = shizuku.NewImage(meme)
+	return
 
 }
