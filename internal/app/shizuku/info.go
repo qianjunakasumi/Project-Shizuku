@@ -3,20 +3,11 @@
 ************************************************************************************************************************
 * Basic:
 *
-*   Package Name : uehara
-*   File Name    : networkMiddleware.go
-*   File Path    : internal/uehara/
+*   Package Name : shizuku
+*   File Name    : info.go
+*   File Path    : internal/app/shizuku/
 *   Author       : Qianjunakasumi
-*   Description  : 适用于 Mirai 的网络中间件
-*
-*----------------------------------------------------------------------------------------------------------------------*
-* Summary:
-*   Variables:
-*     json -- JSON 解析器
-*
-*   type Content map[string]interface{} -- Mirai API 返回的内容结构
-*
-*   func post(address string, content Content) (Content, error)  -- GET Mirai API Content
+*   Description  : 应用定义
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -39,52 +30,66 @@
 *   along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
 *----------------------------------------------------------------------------------------------------------------------*/
 
-package uehara
+package shizuku
 
 import (
-	"io/ioutil"
-
-	"github.com/qianjunakasumi/project-shizuku/configs"
-	"github.com/qianjunakasumi/project-shizuku/internal/utils/networkware"
-
-	jsoniter "github.com/json-iterator/go"
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku"
 )
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
+type shizukuchan struct{}
 
-// Content Mirai 返回的内容
-type Content map[string]interface{}
+type subApper interface {
+	onSubCallByQQ(qp *shizuku.QQMsg, cl map[string]string) (*shizuku.Message, error)
+}
 
-func post(address string, content Content) (Content, error) {
+var subList = map[string]subApper{
+	"系统信息": new(sysInfo),
+}
 
-	bytes, err := json.Marshal(&content)
+func init() {
+
+	shizuku.NewApp(&shizuku.AppInfo{
+		Name:        "shizuku",
+		DisplayName: "小雫",
+		Keys:        []string{"s", "小雫"},
+		Expand: []shizuku.Expand{
+			{
+				"func",
+				"功能",
+				[]string{"功能", "操作"},
+				getKeys(),
+				false,
+				"",
+			},
+		},
+		Pointer: new(shizukuchan),
+	})
+
+}
+
+func getKeys() []string {
+
+	var l []string
+	for k := range subList {
+		l = append(l, k)
+	}
+
+	return l
+
+}
+
+func (s shizukuchan) OnCall(qm *shizuku.QQMsg, _ *shizuku.SHIZUKU) (rm *shizuku.Message, err error) {
+
+	f := subList[qm.Call["func"]]
+	if f == nil {
+		return shizuku.NewText("欢迎使用小雫Project SHIZUKU"), nil
+	}
+
+	r, err := f.onSubCallByQQ(qm, qm.Call)
 	if err != nil {
 		return nil, err
 	}
 
-	req := new(networkware.Networkware)
-	req.Address = "http://" + configs.Conf.MiraiAddress + "/" + address
-	req.Body = bytes
-	req.Method = "POST"
-	req.Header = [][]string{
-		{"Content-Type", "application/json; charset=utf-8"},
-	}
-
-	res, err := req.Send()
-	if err != nil {
-		return nil, err
-	}
-	cont, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	content2 := make(Content)
-	if err = json.Unmarshal(cont, &content2); err != nil {
-		return nil, err
-	}
-
-	return content2, nil
+	return r, nil
 
 }
