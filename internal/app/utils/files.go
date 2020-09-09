@@ -7,7 +7,7 @@
 *   File Name    : files.go
 *   File Path    : internal/app/utils/
 *   Author       : Qianjunakasumi
-*   Description  : 表情
+*   Description  : 文件相关工具
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
