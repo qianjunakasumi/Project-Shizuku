@@ -33,43 +33,19 @@
 package kasumi
 
 import (
-	"errors"
 	"net/http"
 )
 
-// MiraiReq 适用于 MiraiReq 的网络请求
-func (n *Network) MiraiReq() (C, error) {
+// TwitterReq 适用于 Twitter 的网络请求
+func (n *Network) TwitterReq() (res *http.Response) {
 
-	n.Addr = "http://" + n.Host + "/" + n.Addr
-	n.Header = [][]string{
-		{"Content-Type", "application/json; charset=utf-8"},
-	}
+	n.Addr = "https://" + n.Addr
+	n.Header = [][]string{}
 
 	c := make(chan *http.Response)
-
 	go n.send(c)
 
-	res := <-c
-	if res == nil {
-
-		return nil, errors.New("网络请求失败")
-
-	}
-
-	defer res.Body.Close()
-
-	content, err := n.jsonToMap(res)
-	if err != nil {
-
-		return nil, err
-
-	}
-
-	return content, nil
-
-}
-
-// TwitterReq 适用于 Twitter 的网络请求
-func (n Network) TwitterReq() {
+	res = <-c
+	return
 
 }

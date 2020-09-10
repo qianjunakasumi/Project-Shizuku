@@ -33,17 +33,11 @@
 package kasumi
 
 import (
-	"bytes"
 	"net/http"
 	"net/url"
 
-	"github.com/qianjunakasumi/project-shizuku/internal/utils/json"
-
 	"github.com/rs/zerolog/log"
 )
-
-// C 内容
-type C map[string]interface{}
 
 /*
 Request 请求字段
@@ -55,7 +49,6 @@ Addr 和 Method 是必填字段
 type Request struct {
 	Host      string     // 主机
 	Addr      string     // 地址
-	Body      C          // 内容
 	Method    string     // 模式
 	Header    [][]string // 请求头
 	ProxyAddr string     // 代理地址
@@ -70,14 +63,10 @@ type Network struct {
 func New(r *Request) *Network {
 
 	if r.Addr == "" || r.Method == "" {
-
 		return nil
-
 	}
 
-	return &Network{
-		Request: r,
-	}
+	return &Network{Request: r}
 
 }
 
@@ -113,9 +102,7 @@ func (n Network) setClient() (*http.Client, error) {
 func (n Network) setHeader(r *http.Request) {
 
 	for i := 0; i < len(n.Header); i++ {
-
 		r.Header.Set(n.Header[i][0], n.Header[i][1])
-
 	}
 
 }
@@ -124,56 +111,31 @@ func (n Network) send(c chan *http.Response) {
 
 	var (
 		client, err = n.setClient()
-		b           []byte
 		res         *http.Response
 	)
 
 	// 避免 deadlock 产生 panic ，注意可能 nil
 	defer func() {
-
 		c <- res
-
 	}()
 
 	if err != nil {
-
 		log.Error().Err(err).Msg("设置客户端出错")
-
 		return
-
 	}
 
-	if n.Body != nil {
-
-		b, err = json.JSON.Marshal(&n.Body)
-		if err != nil {
-
-			log.Error().Err(err).Msg("转换 JSON 出错")
-
-			return
-
-		}
-
-	}
-
-	req, err := http.NewRequest(n.Method, n.Addr, bytes.NewBuffer(b))
+	req, err := http.NewRequest(n.Method, n.Addr, nil)
 	if err != nil {
-
 		log.Error().Err(err).Msg("新建请求出错")
-
 		return
-
 	}
 
 	n.setHeader(req)
 
 	res, err = client.Do(req)
 	if err != nil {
-
 		log.Error().Err(err).Msg("返回错误")
-
 		return
-
 	}
 
 }
