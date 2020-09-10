@@ -5,7 +5,7 @@
 *
 *   Package Name : llas
 *   File Name    : random.go
-*   File Path    : internal/shizuku/llas/
+*   File Path    : internal/app/llas/
 *   Author       : Qianjunakasumi
 *   Description  : 随机场景
 *

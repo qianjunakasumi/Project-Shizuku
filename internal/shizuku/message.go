@@ -79,8 +79,6 @@ func (s *SHIZUKU) process(m *QQMsg) {
 		}
 		if r == nil {
 			return
-		} else {
-			ok = true
 		}
 
 	}

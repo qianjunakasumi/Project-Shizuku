@@ -37,6 +37,7 @@ import (
 	"strings"
 )
 
+// Idol 偶像
 type Idol struct {
 	ID       string   // 主键
 	Name     string   // 声优名
@@ -51,6 +52,7 @@ type twitter struct {
 	Push      func(x float64) float64 // 推送查询几率
 }
 
+// Idols 偶像列表
 var Idols = []Idol{{
 	"00",
 	"ラブライブ！シリーズ公式",
