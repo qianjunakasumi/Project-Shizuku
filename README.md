@@ -93,6 +93,12 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 ### 鸣谢
 
+感谢 [JetBrains](https://www.jetbrains.com/?from=project-shizuku) 提供 IDE 开发环境开源许可证的授权
+
+[
+<img width="160" src="https://s1.ax1x.com/2020/09/11/wtU9YT.png" alt="jetbrains">
+](https://www.jetbrains.com/?from=project-shizuku)
+
 <img width="160" src="https://s1.ax1x.com/2020/05/16/YcD4De.png" alt="谢谢">
 
 ## 执行标准
@@ -107,8 +113,6 @@ SHIZUKU💧（注音：`しずく`） 是一个帮助用户获取、理解有关
 
 > ### 应用程序
 
-- [project-mirai/mirai-api-http](https://github.com/project-mirai/mirai-api-http) AGPL-3.0 许可
-- [LXY1226/MiraiOK](https://github.com/LXY1226/miraiOK)
 - [mariadb](https://mariadb.com/) GPL-2.0 许可
 
 > ### 依赖
