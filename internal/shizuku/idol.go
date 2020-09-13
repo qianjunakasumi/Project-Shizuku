@@ -39,11 +39,11 @@ import (
 
 // Idol 偶像
 type Idol struct {
-	ID       string   // 主键
-	Name     string   // 声优名
-	PickName string   // 角色名
-	Key      []string // 关键字
-	Twitter  twitter  // Twitter 相关
+	ID         string   // 主键
+	Name       string   // 角色名
+	SeiyuuName string   // 声优名
+	Key        []string // 关键字
+	Twitter    twitter  // Twitter 相关
 }
 
 type twitter struct {
@@ -202,6 +202,20 @@ var Idols = []Idol{{
 	twitter{
 		"k_moeka_",
 		"4110103573",
+		func(x float64) float64 {
+			return -0.0047*math.Pow(x, 4) + 0.1544*math.Pow(x, 3) - 1.1701*math.Pow(x, 2) + 2.8274*x + 4.8613
+		}},
+}, {
+	"11",
+	"高咲侑",
+	"矢野 妃菜喜",
+	[]string{
+		"高咲侑",
+		"矢野", "妃菜喜", "yano_hinaki35",
+	},
+	twitter{
+		"yano_hinaki35",
+		"350173689",
 		func(x float64) float64 {
 			return -0.0047*math.Pow(x, 4) + 0.1544*math.Pow(x, 3) - 1.1701*math.Pow(x, 2) + 2.8274*x + 4.8613
 		}},
