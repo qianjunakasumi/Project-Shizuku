@@ -36,45 +36,49 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/qianjunakasumi/project-shizuku/internal/app/utils"
+
 	"github.com/Mrs4s/MiraiGo/client"
 	m2 "github.com/Mrs4s/MiraiGo/message"
 	"github.com/rs/zerolog/log"
 )
 
-// Rina Rina // TODO 更多
-type Rina struct {
-	c       *client.QQClient // 客户端
-	msgChan *chan *QQMsg     // 消息管道
-}
-
-// QQMsg 接收的 QQ 消息
-type QQMsg struct {
-	Type  *Idol
-	Chain []Chain // 消息链
-	Call  map[string]string
-	Group struct {
-		ID   uint64 // 群号
-		Name string // 群名
+type (
+	// Rina Rina QQ 客户端
+	Rina struct {
+		c       *client.QQClient // 客户端
+		msgChan *chan *QQMsg     // 消息管道
 	}
-	User struct {
-		ID   uint64 // QQ号
-		Name string // QQ名
+
+	// QQMsg 接收的 QQ 消息
+	QQMsg struct {
+		Type  *Idol             // 偶像
+		Chain []Chain           // 消息链
+		Call  map[string]string // 参数
+		Group struct {
+			ID   uint64 // 群号
+			Name string // 群名
+		} // 群相关
+		User struct {
+			ID   uint64 // QQ号
+			Name string // QQ名
+		} // 用户相关
 	}
-}
 
-// Chain 消息链
-type Chain struct {
-	Type string // 类型：text、image、at
-	Text string // text
-	URL  string // image
-	QQ   uint64 // at
-}
+	// Chain 消息链
+	Chain struct {
+		Type string // 类型：text、image、at
+		Text string // text
+		URL  string // image
+		QQ   uint64 // at
+	}
 
-// Message 返回的 QQ 消息
-type Message struct {
-	target uint64            // 目标
-	chain  m2.SendingMessage // 消息链
-}
+	// Message 返回的 QQ 消息
+	Message struct {
+		target uint64            // 目标
+		chain  m2.SendingMessage // 消息链
+	}
+)
 
 // newRina 新增 Rina
 func newRina(i uint64, p string, ch *chan *QQMsg) (r *Rina) {
@@ -83,11 +87,11 @@ func newRina(i uint64, p string, ch *chan *QQMsg) (r *Rina) {
 	if err != nil {
 		log.Panic().Err(err).Msg("设置设备信息失败")
 	}
+	client.SystemDeviceInfo.Protocol = client.AndroidPhone
 
 	c := client.NewClient(int64(i), p)
 	c.OnLog(func(q *client.QQClient, e *client.LogEvent) {
 		switch e.Type {
-
 		case "INFO":
 			log.Info().Str("信息", e.Message).Msg("协议")
 
@@ -139,6 +143,24 @@ func (r Rina) login() (err error) {
 func (r Rina) regEventHandle() {
 
 	r.c.OnGroupMessage(r.onGroupMsg)
+	r.c.OnGroupNotify(func(q *client.QQClient, e client.IGroupNotifyEvent) {
+		switch e := e.(type) {
+		case *client.GroupPokeNotifyEvent:
+
+			if e.Receiver != r.c.Uin {
+				return
+			}
+
+			f, err := utils.GetFileNameByDir("assets/voice/event/poke/01/")
+			if err != nil {
+				log.Error().Err(err).Msg("接受Pock")
+				return
+			}
+
+			r.SendGroupMsg(NewAudio(f).To(uint64(e.GroupCode)))
+		}
+
+	})
 
 	// 断线重连
 	r.c.OnDisconnected(func(q *client.QQClient, e *client.ClientDisconnectedEvent) {
@@ -203,7 +225,7 @@ func (r Rina) onGroupMsg(_ *client.QQClient, m *m2.GroupMessage) {
 	}
 
 	log.Info().
-		Interface("群类型", msg.Type.PickName).
+		Interface("群类型", msg.Type.SeiyuuName).
 		Str("群名", msg.Group.Name).
 		Str("昵称", msg.User.Name).
 		Interface("原文", msg.Chain).
