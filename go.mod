@@ -3,21 +3,14 @@ module github.com/qianjunakasumi/project-shizuku
 go 1.15
 
 require (
-	github.com/Mrs4s/MiraiGo v0.0.0-20200902072401-56d3e65e98b5
+	github.com/Mrs4s/MiraiGo v0.0.0-20200912144206-ba9ffe0f419b
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
-	github.com/chromedp/cdproto v0.0.0-20200709115526-d1f6fc58448b // indirect
 	github.com/chromedp/chromedp v0.5.3
 	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/gobwas/pool v0.2.1 // indirect
-	github.com/gobwas/ws v1.0.3 // indirect
 	github.com/json-iterator/go v1.1.10
-	github.com/mailru/easyjson v0.7.6 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.19.0
 	github.com/shirou/gopsutil v2.20.8+incompatible
-	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
