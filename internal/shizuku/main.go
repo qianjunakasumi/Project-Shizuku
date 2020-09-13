@@ -7,11 +7,7 @@
 *   File Name    : main.go
 *   File Path    : internal/shizuku/
 *   Author       : Qianjunakasumi
-*   Description  : 启动 UEHARA 应用
-*
-*----------------------------------------------------------------------------------------------------------------------*
-* Summary:
-*   func Start() error -- 启动 UEHARA 连接，初始化应用信息
+*   Description  : SHIZUKU 关键功能
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -36,18 +32,159 @@
 
 package shizuku
 
-import "github.com/qianjunakasumi/project-shizuku/internal/uehara"
+import (
+	"github.com/qianjunakasumi/project-shizuku/configs"
+	"github.com/qianjunakasumi/project-shizuku/internal/utils/database"
+	"github.com/robfig/cron/v3"
+	"github.com/rs/zerolog/log"
+)
 
-func Start() error {
-
-	if err := uehara.Connect(); err != nil {
-
-		return err
-
+type (
+	// SHIZUKU SHIZUKU Robot
+	SHIZUKU struct {
+		QQID    uint64         // QQ 号
+		Rina    *Rina          // Rina
+		msgChan *chan *QQMsg   // 消息管道
+		command []*AppInfo     // 应用列表
+		Job     map[uint64]job // 工作列表
 	}
 
-	uehara.InitApp()
+	job struct {
+		Enable  bool
+		Pointer AppJober
+	}
 
-	return nil
+	// Apper 应用接口
+	Apper interface {
+		OnCall(qm *QQMsg, sz *SHIZUKU) (rm *Message, err error)
+	}
+
+	// AppJober 应用事务接口
+	AppJober interface {
+		OnJobCall(qm *QQMsg, sz *SHIZUKU) (rm *Message, err error)
+	}
+
+	// AppTaskr 应用任务接口
+	AppTaskr interface {
+		OnScheduleCall(sz *SHIZUKU) (rm *Message, err error)
+	}
+
+	// AppInfo 应用信息
+	AppInfo struct {
+		Name        string   // 应用名称
+		DisplayName string   // 应用显示名称
+		Keys        []string // 应用关键字
+		Expand      []Expand // 扩展
+		Pointer     Apper    // 应用实例
+	}
+
+	// Expand 扩展
+	Expand struct {
+		Name        string   // 扩展名称
+		DisplayName string   // 扩展显示名称
+		Keys        []string // 扩展关键字
+		Limit       []string // 扩展值限制
+		Require     bool     // 是否必须
+		Default     string   // 默认值
+	}
+
+	// AppTaskInfo 应用任务信息
+	AppTaskInfo struct {
+		Name    string   // 任务名称
+		Spec    string   // 执行时间
+		QQID    uint64   // 任务目标
+		Pointer AppTaskr // 应用实例
+	}
+
+	task struct {
+		Info *AppTaskInfo // 信息
+	}
+)
+
+var (
+	shizuku      *SHIZUKU       // 应用
+	InitAppInfo  []*AppInfo     // 初始化时应用信息列表
+	InitTaskInfo []*AppTaskInfo // 初始化时任务列表
+)
+
+// NewApp 新建应用
+func NewApp(i *AppInfo) {
+
+	InitAppInfo = append(InitAppInfo, i)
+	log.Info().Str("命令", i.DisplayName).Msg("注册命令成功")
 
 }
+
+// NewApp 新建定时任务
+func NewTask(i *AppTaskInfo) {
+
+	InitTaskInfo = append(InitTaskInfo, i)
+	log.Info().Str("任务", i.Name).Msg("注册定时任务成功")
+
+}
+
+// New 新建 SHIZUKU Robot
+func New() {
+
+	c, err := configs.ReadConfigs()
+	if err != nil {
+		log.Panic().Err(err).Msg("读取配置错误")
+	}
+
+	err = database.Connect()
+	if err != nil {
+		log.Error().Err(err).Msg("无法连接至数据库")
+	}
+
+	var (
+		ch = make(chan *QQMsg, 10)
+		r  = newRina(c.QQID, c.QQPassword, &ch)
+	)
+
+	s := &SHIZUKU{
+		QQID:    c.QQID,
+		Rina:    r,
+		msgChan: &ch,
+		command: InitAppInfo,
+		Job:     make(map[uint64]job),
+	}
+
+	cron2 := cron.New()
+	for i := 0; i < len(InitTaskInfo); i++ {
+
+		_, err := cron2.AddJob(InitTaskInfo[i].Spec, task{Info: InitTaskInfo[i]})
+		if err != nil {
+			log.Error().Err(err).Msg("注册任务失败")
+		}
+
+	}
+	cron2.Start()
+
+	go s.monitor()
+	r.regEventHandle()
+
+	shizuku = s
+
+}
+
+// Run 定时任务执行实现
+func (t task) Run() {
+
+	log.Info().Str("任务", t.Info.Name).Msg("执行定时任务")
+	rm, err := t.Info.Pointer.OnScheduleCall(shizuku)
+	if err != nil {
+		log.Error().Err(err).Msg("定时任务执行失败")
+	}
+	if rm == nil {
+		return
+	}
+
+	shizuku.Rina.SendGroupMsg(rm.To(t.Info.QQID))
+
+}
+
+// OpenJob 开启一个事务
+func (s *SHIZUKU) OpenJob(u uint64, p AppJober) { s.Job[u] = job{true, p} }
+
+// CloseJob 关闭一个事务
+func (s *SHIZUKU) CloseJob(u uint64) { delete(s.Job, u) }
