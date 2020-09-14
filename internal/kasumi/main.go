@@ -47,7 +47,6 @@ Addr 和 Method 是必填字段
 当上述字段留空时返回空指针，请谨慎使用
 */
 type Request struct {
-	Host      string     // 主机
 	Addr      string     // 地址
 	Method    string     // 模式
 	Header    [][]string // 请求头
@@ -59,7 +58,11 @@ type Network struct {
 	*Request // 请求字段
 }
 
-// New 新建网络请求件
+/*
+New 新建网络请求件
+
+请求失败返回 nil ，请务必检查
+*/
 func New(r *Request) *Network {
 
 	if r.Addr == "" || r.Method == "" {
