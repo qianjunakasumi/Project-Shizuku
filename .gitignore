@@ -17,7 +17,6 @@
 # SHIZUKU
 .idea/
 configs/configs.yml
-assets/audio/
-assets/game/
-assets/images/
+assets/
+build/
 *.lnk
