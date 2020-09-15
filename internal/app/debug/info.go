@@ -32,7 +32,13 @@
 
 package debug
 
-import "github.com/qianjunakasumi/project-shizuku/internal/shizuku"
+import (
+	"runtime"
+	"strconv"
+	"time"
+
+	"github.com/qianjunakasumi/project-shizuku/internal/shizuku"
+)
 
 type debug struct{}
 
@@ -66,10 +72,18 @@ func init() {
 
 func (d debug) OnCall(qm *shizuku.QQMsg, _ *shizuku.SHIZUKU) (rm *shizuku.Message, err error) {
 
-	switch qm.Call["func"] {
-	default:
-		rm = shizuku.NewText("请输入正确的调试内容")
+	rm = shizuku.NewText("> Project SHIZUKU 调试：\n")
 
+	switch qm.Call["func"] {
+	case "内存":
+		var m runtime.MemStats
+		runtime.ReadMemStats(&m)
+		rm = rm.AddText("堆分配：" + strconv.FormatUint(m.Alloc/1024/1024, 10) + " M\n").
+			AddText("OS分配：" + strconv.FormatUint(m.Sys/1024/1024, 10) + " M\n").
+			AddText("上次GC：" + time.Unix(int64(m.LastGC), 0).Format(time.RFC3339))
+
+	default:
+		rm = rm.AddText("请输入正确的调试内容")
 	}
 
 	return
