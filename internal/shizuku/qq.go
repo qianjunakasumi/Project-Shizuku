@@ -33,7 +33,12 @@
 package shizuku
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"net"
+	"os"
 	"time"
 
 	"github.com/qianjunakasumi/project-shizuku/internal/app/utils"
@@ -83,7 +88,7 @@ type (
 // newRina 新增 Rina
 func newRina(i uint64, p string, ch *chan *QQMsg) (r *Rina) {
 
-	err := client.SystemDeviceInfo.ReadJson([]byte("{\"display\":\"MIRAI.666470.001\",\"product\":\"mirai\",\"device\":\"mirai\",\"board\":\"mirai\",\"model\":\"mirai\",\"finger_print\":\"mamoe/mirai/mirai:10/MIRAI.200122.001/5696651:user/release-keys\",\"boot_id\":\"58fe8ac7-4de7-71ec-073d-07eb3187a533\",\"proc_version\":\"Linux version 3.0.31-HxHC3WtY (android-build@xxx.xxx.xxx.xxx.com)\",\"imei\":\"351912693210254\"}"))
+	err := client.SystemDeviceInfo.ReadJson([]byte("{\"display\":\"MIRAI.113756.001\",\"product\":\"mirai\",\"device\":\"mirai\",\"board\":\"mirai\",\"model\":\"mirai\",\"finger_print\":\"mamoe/mirai/mirai:10/MIRAI.200122.001/7480803:user/release-keys\",\"boot_id\":\"d56e8498-1c1e-f211-e4c6-e66e51d437d0\",\"proc_version\":\"Linux version 3.0.31-aXSE4d9w (android-build@xxx.xxx.xxx.xxx.com)\",\"imei\":\"016312797967405\"}"))
 	if err != nil {
 		log.Panic().Err(err).Msg("设置设备信息失败")
 	}
@@ -111,12 +116,24 @@ func newRina(i uint64, p string, ch *chan *QQMsg) (r *Rina) {
 
 func (r Rina) login() (err error) {
 
-	re, err := r.c.Login()
+	res, err := r.c.Login()
 	if err != nil {
 		return
 	}
-	if !re.Success {
-		return
+	for !res.Success {
+
+		switch res.Error {
+		case client.NeedCaptcha:
+			_, err := r.c.SubmitCaptcha(r.needCap(res), res.CaptchaSign)
+			if err != nil {
+				log.Error().Err(err).Msg("提交验证码错误")
+				continue
+			}
+
+		default:
+			log.Panic().Msg("无法登录")
+		}
+
 	}
 
 	log.Info().Msg("登录成功：" + r.c.Nickname)
@@ -137,6 +154,29 @@ func (r Rina) login() (err error) {
 	log.Info().Int("个数", len(r.c.FriendList)).Msg("加载好友列表成功")
 
 	return
+
+}
+
+func (r Rina) needCap(res *client.LoginResponse) string {
+
+	file, err := os.Create("ca.jpg")
+	if err != nil {
+		log.Error().Err(err).Msg("创建验证码图片失败")
+	}
+
+	_, err = io.Copy(file, bytes.NewReader(res.CaptchaImage))
+	if err != nil {
+		log.Error().Err(err).Msg("写入验证码图片失败")
+	}
+
+	log.Info().Msg("请打开图片（ca.jpg）填写验证码")
+
+	var c string
+	if _, err := fmt.Scanln(&c); err != nil {
+		log.Error().Err(err).Msg("读取错误，写的什么东西，爬")
+	}
+
+	return c
 
 }
 
@@ -175,6 +215,21 @@ func (r Rina) regEventHandle() {
 
 			return
 
+		}
+	})
+
+	// 更新服务器
+	r.c.OnServerUpdated(func(q *client.QQClient, e *client.ServerUpdatedEvent) {
+		log.Warn().Msg("更新服务器")
+
+		if len(e.Servers) == 0 {
+			log.Error().Msg("更新服务器地址长度为0")
+			return
+		}
+
+		r.c.CustomServer = &net.TCPAddr{
+			IP:   net.ParseIP(e.Servers[0].Server),
+			Port: int(e.Servers[0].Port),
 		}
 	})
 
