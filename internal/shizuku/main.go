@@ -66,7 +66,7 @@ type (
 
 	// AppTaskr 应用任务接口
 	AppTaskr interface {
-		OnScheduleCall(sz *SHIZUKU) (rm *Message, err error)
+		OnTaskCall(sz *SHIZUKU) (rm *Message, err error)
 	}
 
 	// AppInfo 应用信息
@@ -131,7 +131,7 @@ func New() {
 		log.Panic().Err(err).Msg("读取配置错误")
 	}
 
-	err = database.Connect()
+	err = database.Connect(c.Databaseurl)
 	if err != nil {
 		log.Error().Err(err).Msg("无法连接至数据库")
 	}
@@ -171,7 +171,7 @@ func New() {
 func (t task) Run() {
 
 	log.Info().Str("任务", t.Info.Name).Msg("执行定时任务")
-	rm, err := t.Info.Pointer.OnScheduleCall(shizuku)
+	rm, err := t.Info.Pointer.OnTaskCall(shizuku)
 	if err != nil {
 		log.Error().Err(err).Msg("定时任务执行失败")
 	}
