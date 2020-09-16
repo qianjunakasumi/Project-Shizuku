@@ -117,7 +117,9 @@ func (g *guesssong) OnJobCall(qm *shizuku.QQMsg, sz *shizuku.SHIZUKU) (rm *shizu
 
 	if song.times > 20 {
 		sz.CloseJob(qm.Group.ID)
+		delete(g.gameData, qm.Group.ID)
 		rm = shizuku.NewText("啊这，猜的次数太多啦。辛苦了，请休息一下再来游玩趴~")
+		return
 	}
 
 	switch t {
