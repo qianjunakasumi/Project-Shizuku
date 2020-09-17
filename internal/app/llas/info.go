@@ -40,7 +40,7 @@ func init() {
 		Name:        "RandomStill",
 		DisplayName: "来一张场景",
 		Keys:        []string{"来一张场景", "lyzcj", "still"},
-		Expand: []shizuku.Expand{
+		Expand: shizuku.Expand{
 			{
 				"idol",
 				"偶像",

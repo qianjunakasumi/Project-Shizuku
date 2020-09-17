@@ -52,7 +52,7 @@ func init() {
 		Name:        "shizuku",
 		DisplayName: "小雫",
 		Keys:        []string{"s", "小雫"},
-		Expand: []shizuku.Expand{
+		Expand: shizuku.Expand{
 			{
 				"func",
 				"功能",

@@ -40,7 +40,7 @@ func init() {
 		Name:        "guessSong",
 		DisplayName: "阅词识曲",
 		Keys:        []string{"阅词识曲", "阅词识歌", "阅词猜曲", "看词猜歌", "看词识歌", "看词猜歌", "ycsq"},
-		Expand:      []shizuku.Expand{},
+		Expand:      shizuku.Expand{},
 		Pointer:     new(guesssong).initApp(),
 	})
 

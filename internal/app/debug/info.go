@@ -48,7 +48,7 @@ func init() {
 		Name:        "debug",
 		DisplayName: "调试",
 		Keys:        []string{"debug"},
-		Expand: []shizuku.Expand{
+		Expand: shizuku.Expand{
 			{
 				"func",
 				"功能",

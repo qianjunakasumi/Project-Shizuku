@@ -74,12 +74,12 @@ type (
 		Name        string   // 应用名称
 		DisplayName string   // 应用显示名称
 		Keys        []string // 应用关键字
-		Expand      []Expand // 扩展
+		Expand      Expand   // 扩展
 		Pointer     Apper    // 应用实例
 	}
 
 	// Expand 扩展
-	Expand struct {
+	Expand []struct {
 		Name        string   // 扩展名称
 		DisplayName string   // 扩展显示名称
 		Keys        []string // 扩展关键字
