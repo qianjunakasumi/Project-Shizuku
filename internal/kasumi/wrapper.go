@@ -37,10 +37,15 @@ import (
 )
 
 // TwitterReq 适用于 Twitter 的网络请求
-func (n *Network) TwitterReq() (res *http.Response) {
+func (n *Network) TwitterReq(p string) (res *http.Response) {
 
 	n.Addr = "https://" + n.Addr
-	n.Header = [][]string{}
+	n.Header = append(n.Header,
+		[]string{
+			"user-agent",
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4128.3 Safari/537.36",
+		})
+	n.ProxyAddr = p
 
 	c := make(chan *http.Response)
 	go n.send(c)
