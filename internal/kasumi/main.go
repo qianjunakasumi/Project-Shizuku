@@ -78,27 +78,19 @@ func (n Network) setClient() (*http.Client, error) {
 	var tran *http.Transport
 
 	if a := n.ProxyAddr; a == "" {
-
 		tran = new(http.Transport)
-
 	} else { // 使用代理地址请求
 
 		u, err := url.Parse(a)
 		if err != nil {
-
 			return nil, err
-
 		}
 
-		tran = &http.Transport{
-			Proxy: http.ProxyURL(u),
-		}
+		tran = &http.Transport{Proxy: http.ProxyURL(u)}
 
 	}
 
-	return &http.Client{
-		Transport: tran,
-	}, nil
+	return &http.Client{Transport: tran}, nil
 
 }
 
@@ -118,9 +110,7 @@ func (n Network) send(c chan *http.Response) {
 	)
 
 	// 避免 deadlock 产生 panic ，注意可能 nil
-	defer func() {
-		c <- res
-	}()
+	defer func() { c <- res }()
 
 	if err != nil {
 		log.Error().Err(err).Msg("设置客户端出错")
