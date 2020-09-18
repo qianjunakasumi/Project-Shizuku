@@ -37,7 +37,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"os"
 	"time"
 
@@ -227,10 +226,11 @@ func (r Rina) regEventHandle() {
 			return
 		}
 
-		r.c.CustomServer = &net.TCPAddr{
-			IP:   net.ParseIP(e.Servers[0].Server),
-			Port: int(e.Servers[0].Port),
-		}
+		/*
+			r.c.CustomServer = &net.TCPAddr{
+				IP:   net.ParseIP(e.Servers[0].Server),
+				Port: int(e.Servers[0].Port),
+			}*/
 	})
 
 }
@@ -238,7 +238,7 @@ func (r Rina) regEventHandle() {
 func (r Rina) onGroupMsg(_ *client.QQClient, m *m2.GroupMessage) {
 
 	msg := &QQMsg{
-		Type:  FuzzyGetIdol(m.GroupName),
+		Type:  shizuku.FuzzyGetIdol(m.GroupName),
 		Chain: []Chain{},
 		Group: struct {
 			ID   uint64
@@ -301,6 +301,9 @@ func NewImage(p string) *Message { m := &Message{chain: m2.SendingMessage{}}; re
 // NewAudio 新建音频消息结构体
 func NewAudio(p string) *Message { m := &Message{chain: m2.SendingMessage{}}; return m.AddAudio(p) }
 
+// NewJSON 新建 JSON 卡片消息结构体
+func NewJSON(s string) *Message { m := &Message{chain: m2.SendingMessage{}}; return m.AddJSON(s) }
+
 // AddText 添加文本
 func (m *Message) AddText(t string) *Message { m.chain.Append(m2.NewText(t)); return m }
 
@@ -333,6 +336,9 @@ func (m *Message) AddAudio(p string) *Message {
 	return m
 
 }
+
+// AddJSON 添加 JSON 卡片
+func (m *Message) AddJSON(s string) *Message { m.chain.Append(m2.NewLightApp(s)); return m }
 
 // To 发送的目标
 func (m *Message) To(i uint64) *Message { m.target = i; return m }
