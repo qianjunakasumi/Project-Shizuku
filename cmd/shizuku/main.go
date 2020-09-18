@@ -33,13 +33,8 @@
 package main
 
 import (
-	"bufio"
-	"os"
-
 	_ "github.com/qianjunakasumi/project-shizuku/cmd/shizuku/basic" // 全局初始化
 	"github.com/qianjunakasumi/project-shizuku/internal/shizuku"
-
-	"github.com/rs/zerolog/log"
 
 	_ "github.com/qianjunakasumi/project-shizuku/internal/app/debug"     // 调试 应用
 	_ "github.com/qianjunakasumi/project-shizuku/internal/app/guesssong" // 阅词识曲 应用
@@ -56,25 +51,9 @@ func main() {
 
 	// 调试程序使用
 	/*go func() {
-		log.Error().Err(http.ListenAndServe(":520", nil)).Msg("步梦")
+		log.Error().Err(http.ListenAndServe(":520", nil)).Msg("初始化错误")
 	}()*/
 
-	sc := bufio.NewScanner(os.Stdin)
-	for sc.Scan() {
-
-		t := sc.Text()
-		switch t {
-		case "bye":
-
-			log.Info().Msg("谢谢您的使用，下次再见")
-			os.Exit(2)
-
-		default:
-
-			log.Warn().Msg("您的输入有误，请检查")
-
-		}
-
-	}
+	select {}
 
 }
