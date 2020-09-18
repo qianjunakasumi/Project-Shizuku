@@ -35,6 +35,7 @@ package shizuku
 import (
 	"github.com/qianjunakasumi/project-shizuku/configs"
 	"github.com/qianjunakasumi/project-shizuku/internal/utils/database"
+
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
@@ -42,16 +43,17 @@ import (
 type (
 	// SHIZUKU SHIZUKU Robot
 	SHIZUKU struct {
-		QQID    uint64         // QQ 号
-		Rina    *Rina          // Rina
-		msgChan *chan *QQMsg   // 消息管道
-		command []*AppInfo     // 应用列表
-		Job     map[uint64]job // 工作列表
+		QQID    uint64         // QQID QQ 号
+		Rina    *Rina          // Rina QQ 客户端
+		Job     map[uint64]job // Job 事务列表
+		Conf    configs.App    // Conf 应用配置信息
+		command []*AppInfo     // command 应用列表
+		msgChan chan *QQMsg    // msgChan 消息管道
 	}
 
 	job struct {
-		Enable  bool
-		Pointer AppJober
+		Enable  bool     // Enable 是否启用
+		Pointer AppJober // Pointer 事务实例 指针
 	}
 
 	// Apper 应用接口
@@ -71,11 +73,11 @@ type (
 
 	// AppInfo 应用信息
 	AppInfo struct {
-		Name        string   // 应用名称
-		DisplayName string   // 应用显示名称
-		Keys        []string // 应用关键字
-		Expand      Expand   // 扩展
-		Pointer     Apper    // 应用实例
+		Name        string   // Name 应用名称
+		DisplayName string   // DisplayName 应用显示名称
+		Keys        []string // Keys 应用关键字
+		Expand      Expand   // Expand 扩展
+		Pointer     Apper    // Pointer 应用实例 指针
 	}
 
 	// Expand 扩展
@@ -126,12 +128,8 @@ func NewTask(i *AppTaskInfo) {
 // New 新建 SHIZUKU Robot
 func New() {
 
-	c, err := configs.ReadConfigs()
-	if err != nil {
-		log.Panic().Err(err).Msg("读取配置错误")
-	}
-
-	err = database.Connect(c.Databaseurl)
+	c := configs.GetAllConf()
+	err := database.Connect(c.Databaseurl)
 	if err != nil {
 		log.Error().Err(err).Msg("无法连接至数据库")
 	}
@@ -144,9 +142,10 @@ func New() {
 	s := &SHIZUKU{
 		QQID:    c.QQID,
 		Rina:    r,
-		msgChan: &ch,
-		command: InitAppInfo,
 		Job:     make(map[uint64]job),
+		Conf:    c.App,
+		command: InitAppInfo,
+		msgChan: ch,
 	}
 
 	cron2 := cron.New()
