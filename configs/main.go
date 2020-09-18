@@ -7,19 +7,7 @@
 *   File Name    : main.go
 *   File Path    : configs/
 *   Author       : Qianjunakasumi
-*   Description  : 解析 SHIZUKU 配置参数
-*
-*----------------------------------------------------------------------------------------------------------------------*
-* Summary:
-*   Variables:
-*     Conf      -- 程序配置
-*     Version   -- 版本号
-*     BuildTime -- 编译日期时间
-*     CommitId  -- 提交的短ID
-*
-*   type conf struct -- configs.yml 结构化
-*
-*   func SetConfigs() error -- 读取配置文件载入程序配置
+*   Description  : 读取配置信息
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -50,40 +38,48 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// conf configs.yml结构
-type conf struct {
-	QQNumber         uint32 // Robot QQ号
-	MiraiAddress     string // Mirai API HTTP URL地址
-	MiraiAuthKey     string // Mirai API HTTP AuthKey
-	Databaseurl      string // 数据库地址
-	TranslationAppID string // 百度翻译 APP ID
-	TranslationKey   string // 百度翻译 Key
-}
-
 var (
-	Conf      conf      // 程序配置
-	Version   = "1.0.0" // 版本号
-	BuildTime string    // 编译日期时间
-	CommitId  string    // 提交的短ID
+	Version  = "2.0.0" // Version 版本号
+	CommitId string    // CommitId 提交的短ID
+	confs    *Conf     // confs 配置信息
 )
 
-// SetConfigs 读取配置文件载入程序配置
-func SetConfigs() error {
-
-	file, err := ioutil.ReadFile("configs/configs.yml")
-	if err != nil {
-
-		return err
-
+type (
+	// Conf 配置
+	Conf struct {
+		QQID        uint64 `yaml:"qqID"`        // QQID QQ帐号
+		QQPassword  string `yaml:"qqPassword"`  // QQPassword QQ密码
+		Databaseurl string `yaml:"databaseURL"` // Databaseurl 数据库地址
+		App         App    `yaml:"app"`         // App 应用配置
 	}
 
-	err = yaml.Unmarshal(file, &Conf)
+	// App 应用配置
+	App struct {
+		ProxyAddr        string `yaml:"proxyAddr"`        // ProxyAddr 代理地址
+		TranslationAppID string `yaml:"translationAppid"` // TranslationAppID 百度翻译 APP ID
+		TranslationKey   string `yaml:"translationKey"`   // TranslationKey 百度翻译 Key
+	}
+)
+
+// ReadConfigs 读取配置文件
+func ReadConfigs() (err error) {
+
+	f, err := ioutil.ReadFile("configs/configs.yml")
 	if err != nil {
-
-		return err
-
+		return
 	}
 
-	return nil
+	err = yaml.Unmarshal(f, &confs)
+	if err != nil {
+		return
+	}
+
+	return
 
 }
+
+// GetAllConf 获取所有配置
+func GetAllConf() *Conf { return confs }
+
+// GetProxyAddr 获取代理配置
+func GetProxyAddr() string { return confs.App.ProxyAddr }
