@@ -54,4 +54,9 @@ func init() {
 	log.Info().Msg("Copyright (C) 2020-present  QianjuNakasumi  AGPL-3.0 License | version：" +
 		configs.Version + "+" + configs.CommitId)
 
+	err := configs.ReadConfigs()
+	if err != nil {
+		log.Panic().Err(err).Msg("读取配置失败")
+	}
+
 }
