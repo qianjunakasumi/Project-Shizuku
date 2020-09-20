@@ -16,6 +16,8 @@ github.com/Mrs4s/MiraiGo v0.0.0-20200917113824-677ad1bc814f h1:O7Trm/hbk7P4giiDh
 github.com/Mrs4s/MiraiGo v0.0.0-20200917113824-677ad1bc814f/go.mod h1:cwYPI2uq6nxNbx0nA6YuAKF1V5szSs6FPlGVLQvRUlo=
 github.com/Mrs4s/MiraiGo v0.0.0-20200918134213-a6139bfb2bd9 h1:8EBXOmzPz8PkhxgmqhP19hdabKpDepPR8wwt6SNX1EI=
 github.com/Mrs4s/MiraiGo v0.0.0-20200918134213-a6139bfb2bd9/go.mod h1:cwYPI2uq6nxNbx0nA6YuAKF1V5szSs6FPlGVLQvRUlo=
+github.com/Mrs4s/MiraiGo v0.0.0-20200919153352-249af274638d h1:nGJSE9xQBeDiugBKKX0vUOq51MqlUEm/y2FMfZFH/w4=
+github.com/Mrs4s/MiraiGo v0.0.0-20200919153352-249af274638d/go.mod h1:cwYPI2uq6nxNbx0nA6YuAKF1V5szSs6FPlGVLQvRUlo=
 github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d h1:G0m3OIz70MZUWq3EgK3CesDbo8upS2Vm9/P3FtgI+Jk=
 github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

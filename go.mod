@@ -3,7 +3,7 @@ module github.com/qianjunakasumi/project-shizuku
 go 1.15
 
 require (
-	github.com/Mrs4s/MiraiGo v0.0.0-20200918134213-a6139bfb2bd9
+	github.com/Mrs4s/MiraiGo v0.0.0-20200919153352-249af274638d
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/chromedp/chromedp v0.5.3
 	github.com/go-ole/go-ole v1.2.4 // indirect
