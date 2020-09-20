@@ -39,6 +39,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/qianjunakasumi/project-shizuku/configs"
 	"github.com/qianjunakasumi/project-shizuku/internal/kasumi"
 
 	"github.com/rs/zerolog/log"
@@ -125,7 +126,11 @@ func FetchToken() {
 		Addr:   "twitter.com/kaor1n_n",
 		Method: "GET",
 		Header: [][]string{},
-	}).TwitterReq()
+	}).TwitterReq(configs.GetProxyAddr())
+	if res == nil {
+		log.Error().Msg("请求数据出错")
+		return
+	}
 
 	var (
 		ext  = new(extractToken)
