@@ -52,8 +52,8 @@ type twitter struct {
 	Push      func(x float64) float64 // 推送查询几率
 }
 
-// Idols 偶像列表
-var Idols = []Idol{{
+// idols 偶像列表
+var idols = []Idol{{
 	"00",
 	"ラブライブ！シリーズ公式",
 	"ラブライブ！シリーズ公式",
@@ -222,9 +222,9 @@ var Idols = []Idol{{
 }}
 
 // FuzzyGetIdol 模糊匹配偶像
-func FuzzyGetIdol(n string) *Idol {
+func (s SHIZUKU) FuzzyGetIdol(n string) *Idol {
 
-	for _, v := range Idols {
+	for _, v := range idols {
 		for _, v2 := range v.Key {
 
 			p := strings.Index(n, v2)
@@ -237,6 +237,6 @@ func FuzzyGetIdol(n string) *Idol {
 
 	}
 
-	return &Idols[1]
+	return &idols[1]
 
 }

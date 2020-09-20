@@ -41,10 +41,10 @@ type randomStill struct {
 	root string
 }
 
-func (r randomStill) OnCall(qm *shizuku.QQMsg, _ *shizuku.SHIZUKU) (rm *shizuku.Message, err error) {
+func (r randomStill) OnCall(qm *shizuku.QQMsg, sz *shizuku.SHIZUKU) (rm *shizuku.Message, err error) {
 
 	if c := qm.Call["idol"]; c != "_SHIZUKU默认检查专用" {
-		qm.Type = shizuku.FuzzyGetIdol(c)
+		qm.Type = sz.FuzzyGetIdol(c)
 	}
 
 	still, err := utils.GetFileNameByDir(r.root + qm.Type.ID + "/stills/")
