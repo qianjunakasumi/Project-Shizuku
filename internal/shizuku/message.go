@@ -43,7 +43,7 @@ var sorry = "=== :( 失败 ===\n错误已被记录，感谢您的理解和支持
 
 func (s SHIZUKU) monitor() {
 	for {
-		go s.process(<-*s.msgChan)
+		go s.process(<-s.msgChan)
 	}
 }
 
