@@ -11,13 +11,8 @@ type TweetPush struct {
 }
 
 type TwitterFollowers struct {
-	ID                uint32
-	Date              string
-	Account           uint8
-	FollowersCount    uint32
-	NewFollowersCount uint32
-	HuanbiRate        float32
-	YdayHuanbiRate    float32
-	DingjiRate        float32
-	SyueDingjiRate    float32
+	ID             uint32
+	Date           string
+	Account        uint8
+	FollowersCount uint32
 }
