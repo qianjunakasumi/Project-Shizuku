@@ -2,20 +2,21 @@
     <img width="160" src="https://s1.ax1x.com/2020/07/05/Up59PK.png" alt="SHIZUKU logo">
 </p>
 <p align="center">
-    <img src="https://img.shields.io/badge/%E4%BA%A7%E5%93%81%E5%90%8D%E7%A7%B0-SHIZUKU%F0%9F%92%A7-brightgreen?style=flat-square" alt="产品名称">
-    <img src="https://img.shields.io/badge/%E5%BC%80%E5%8F%91%E5%9B%A2%E9%98%9F-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square" alt="开发团队">
+    <img src="https://img.shields.io/badge/%E9%A1%B9%E7%9B%AE%E5%90%8D-SHIZUKU%F0%9F%92%A7-brightgreen?style=flat-square" alt="项目名">
     <a href="https://goreportcard.com/report/github.com/qianjunakasumi/project-shizuku"><img src="https://goreportcard.com/badge/github.com/qianjunakasumi/project-shizuku?style=flat-square" alt="Go Report Card"></a>
     <img src="https://img.shields.io/github/repo-size/qianjunakasumi/project-shizuku?style=flat-square" alt="repo size">
 </p>
 
 <h2 align="center">虹咲学园 SHIZUKU 未来彩虹🌈</h2>
 
-SHIZUKU 是 虹咲学园未来彩虹🌈同好会 下的开源项目，基于 [MiraiGo](https://github.com/Mrs4s/MiraiGo) 开发 及 [腾讯 QQ](https://im.qq.com/) 群中使用，以偶像为代表的功能性机器人  
+基于 [MiraiGo](https://github.com/Mrs4s/MiraiGo) 开发 及 [腾讯 QQ](https://im.qq.com/) 群中使用，以偶像为代表的功能性机器人  
 项目命名于 [ラブライブ！虹ヶ咲学園スクールアイドル同好会](http://lovelive-anime.jp/nijigasaki/) 中 [桜坂しずく（Osaka Shizuku）](https://lovelive-as.bushimo.jp/member/shizuku/) 的名称，项目中任何涉及包括但不限于偶像姓名、肖像、自我介绍等，其著作权均归 ©プロジェクトラブライブ！虹ヶ咲学園スクールアイドル同好会 所有
 
 ## 介绍
 
 SHIZUKU💧（注音：`しずく`） 是一个集 获取虹咲学园相关**新闻、声优、活动、商品**等信息 和 小游戏 等功能的机器人应用
+
+# 项目重构中... 重构完成前不会新增功能
 
 ### 支持的功能
 
@@ -51,11 +52,12 @@ SHIZUKU💧（注音：`しずく`） 是一个集 获取虹咲学园相关**新
 ![虹咲学园未来彩虹同好会 289625710](https://s1.ax1x.com/2020/08/18/duNsUJ.jpg)
 ![樱坂雫の水滴团 1050964896](https://s1.ax1x.com/2020/08/18/du19eA.jpg)
 ![上原步梦火星团 296973163](https://s1.ax1x.com/2020/08/18/du1Pot.jpg)
+![中须霞の星星团 522730499](https://s1.ax1x.com/2020/08/18/du1CdI.jpg)
 
 
 ## 案例
 
-千橘雫雫@QianjuNana 是 Project SHIZUKU 官方提供的机器人服务
+千橘雫雫@QianjuNana(2103530879) 是 Project SHIZUKU 官方提供的机器人服务
 
 ## 贡献
 
