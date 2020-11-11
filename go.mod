@@ -3,7 +3,7 @@ module github.com/qianjunakasumi/project-shizuku
 go 1.15
 
 require (
-	github.com/Mrs4s/MiraiGo v0.0.0-20201028233041-056792577cd8
+	github.com/Mrs4s/MiraiGo v0.0.0-20201110151417-1b08a69f87c8
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
