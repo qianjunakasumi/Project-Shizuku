@@ -37,6 +37,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"os"
 	"time"
 
@@ -115,22 +116,20 @@ func newRina(i uint64, p string, ch *chan *QQMsg) (r *Rina) {
 
 func (r Rina) login() (err error) {
 
-	res, err := r.c.Login()
-	if err != nil {
-		return
-	}
-	for !res.Success {
+	for res, err := r.c.Login(); err != nil || !res.Success; res, err = r.c.Login() {
 
-		switch res.Error {
-		case client.NeedCaptcha:
-			_, err := r.c.SubmitCaptcha(r.needCap(res), res.CaptchaSign)
-			if err != nil {
-				log.Error().Err(err).Msg("提交验证码错误")
-				continue
+		if err != nil {
+			if err == client.ErrAlreadyOnline {
+				return nil
 			}
 
+			log.Error().Err(err).Msg("登录失败")
+			return err
+		}
+
+		switch res.Error {
 		default:
-			log.Panic().Msg("无法登录")
+			log.Panic().Str("原因", res.ErrorMessage).Msg("无法登录")
 		}
 
 	}
@@ -219,18 +218,22 @@ func (r Rina) regEventHandle() {
 
 	// 更新服务器
 	r.c.OnServerUpdated(func(q *client.QQClient, e *client.ServerUpdatedEvent) {
-		log.Warn().Msg("更新服务器")
+		log.Warn().Interface("数据", e.Servers).Msg("更新服务器")
 
-		if len(e.Servers) == 0 {
-			log.Error().Msg("更新服务器地址长度为0")
+		if len(e.Servers) < 1 {
+			log.Error().Str("原因", "服务器地址长度为 0").Msg("更新服务器失败")
 			return
 		}
 
-		/*
-			r.c.CustomServer = &net.TCPAddr{
-				IP:   net.ParseIP(e.Servers[0].Server),
-				Port: int(e.Servers[0].Port),
-			}*/
+		var a []*net.TCPAddr
+		for _, v := range e.Servers {
+			a = append(a, &net.TCPAddr{
+				IP:   net.ParseIP(v.Server),
+				Port: int(v.Port),
+			})
+		}
+
+		r.c.SetCustomServer(a)
 	})
 
 }
