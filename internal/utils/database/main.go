@@ -7,10 +7,7 @@
 *   File Name    : main.go
 *   File Path    : internal/utils/database/
 *   Author       : Qianjunakasumi
-*   Description  : 数据库连接
-*
-*----------------------------------------------------------------------------------------------------------------------*
-* Summary:
+*   Description  : 数据库相关
 *
 *----------------------------------------------------------------------------------------------------------------------*
 * Copyright:
@@ -38,19 +35,16 @@ package database
 import (
 	"database/sql"
 
-	"github.com/qianjunakasumi/project-shizuku/configs"
-
 	_ "github.com/go-sql-driver/mysql" // 连接数据库需要的包
-	"github.com/rs/zerolog/log"
 )
 
 var DB *sql.DB
 
-func Connect() error {
+func Connect(url string) error {
 
 	var err error
 
-	DB, err = sql.Open("mysql", configs.Conf.Databaseurl)
+	DB, err = sql.Open("mysql", url)
 	if err != nil {
 
 		return err
@@ -65,17 +59,5 @@ func Connect() error {
 	}
 
 	return nil
-
-}
-
-func Close() {
-
-	err := DB.Close()
-	if err != nil {
-
-		log.Error().Err(err)
-		return
-
-	}
 
 }
