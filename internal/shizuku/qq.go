@@ -37,7 +37,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"os"
 	"time"
 
@@ -181,7 +180,7 @@ func (r Rina) needCap(res *client.LoginResponse) string {
 func (r Rina) regEventHandle() {
 
 	r.c.OnGroupMessage(r.onGroupMsg)
-	r.c.OnGroupNotify(func(q *client.QQClient, e client.IGroupNotifyEvent) {
+	r.c.OnGroupNotify(func(q *client.QQClient, e client.INotifyEvent) {
 		switch e := e.(type) {
 		case *client.GroupPokeNotifyEvent:
 
@@ -217,23 +216,9 @@ func (r Rina) regEventHandle() {
 	})
 
 	// 更新服务器
-	r.c.OnServerUpdated(func(q *client.QQClient, e *client.ServerUpdatedEvent) {
+	r.c.OnServerUpdated(func(q *client.QQClient, e *client.ServerUpdatedEvent) bool {
 		log.Warn().Interface("数据", e.Servers).Msg("更新服务器")
-
-		if len(e.Servers) < 1 {
-			log.Error().Str("原因", "服务器地址长度为 0").Msg("更新服务器失败")
-			return
-		}
-
-		var a []*net.TCPAddr
-		for _, v := range e.Servers {
-			a = append(a, &net.TCPAddr{
-				IP:   net.ParseIP(v.Server),
-				Port: int(v.Port),
-			})
-		}
-
-		r.c.SetCustomServer(a)
+		return true
 	})
 
 }
