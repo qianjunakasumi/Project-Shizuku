@@ -13,8 +13,6 @@ scripts/golangci-lint.exe run
 
 "¿ªÊ¼±àÒë..."
 
-go build -ldflags "-w -X ${root}configs.CommitId=${commitid}" -o build/shizuku.exe cmd/shizuku/main.go
-
 $env:GOOS="linux"
 go build -ldflags "-w -X ${root}configs.CommitId=${commitid}" -o build/shizuku cmd/shizuku/main.go
 
