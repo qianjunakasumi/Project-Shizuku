@@ -81,7 +81,6 @@ func (d debug) OnCall(qm *shizuku.QQMsg, _ *shizuku.SHIZUKU) (rm *shizuku.Messag
 		rm = rm.AddText("堆分配：" + strconv.FormatUint(m.Alloc/1024/1024, 10) + " M\n").
 			AddText("OS分配：" + strconv.FormatUint(m.Sys/1024/1024, 10) + " M\n").
 			AddText("上次GC：" + time.Unix(int64(m.LastGC), 0).Format(time.RFC3339))
-
 	default:
 		rm = rm.AddText("请输入正确的调试内容")
 	}
