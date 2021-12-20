@@ -12,11 +12,19 @@
 基于 [MiraiGo](https://github.com/Mrs4s/MiraiGo) 开发 及 [腾讯 QQ](https://im.qq.com/) 群中使用，以偶像为代表的功能性机器人  
 项目命名于 [ラブライブ！虹ヶ咲学園スクールアイドル同好会](http://lovelive-anime.jp/nijigasaki/) 中 [桜坂しずく（Osaka Shizuku）](https://lovelive-as.bushimo.jp/member/shizuku/) 的名称，项目中任何涉及包括但不限于偶像姓名、肖像、自我介绍等，其著作权均归 ©プロジェクトラブライブ！虹ヶ咲学園スクールアイドル同好会 所有
 
+<h2 align="center">于2021年1月8日起停止维护</h2>
+
+**感谢您的支持**。
+请注意，本项目早日停止维护，部分功能可能受限。
+部分依赖存在安全问题，详情 [见此](https://github.com/qianjunakasumi/Project-SHIZUKU/security/dependabot/go.sum/github.com%2Ftidwall%2Fgjson/closed) 。
+若您继续使用，请自行承担风险。
+[最新情报。](https://github.com/qianjunakasumi/)
+
+---
+
 ## 介绍
 
 SHIZUKU💧（注音：`しずく`） 是一个集 获取虹咲学园相关**新闻、声优、活动、商品**等信息 和 小游戏 等功能的机器人应用
-
-# 项目重构中... 重构完成前不会新增功能
 
 ### 支持的功能
 
@@ -49,15 +57,10 @@ SHIZUKU💧（注音：`しずく`） 是一个集 获取虹咲学园相关**新
 
 ## 我们在使用
 
-![虹咲学园未来彩虹同好会 289625710](https://s1.ax1x.com/2020/08/18/duNsUJ.jpg)
 ![樱坂雫の水滴团 1050964896](https://s1.ax1x.com/2020/08/18/du19eA.jpg)
 ![上原步梦火星团 296973163](https://s1.ax1x.com/2020/08/18/du1Pot.jpg)
 ![中须霞の星星团 522730499](https://s1.ax1x.com/2020/08/18/du1CdI.jpg)
 
-
-## 案例
-
-千橘雫雫@QianjuNana(2103530879) 是 Project SHIZUKU 官方提供的机器人服务
 
 ## 贡献
 
@@ -73,8 +76,6 @@ SHIZUKU💧（注音：`しずく`） 是一个集 获取虹咲学园相关**新
 
 ### **渠道**
 
-- [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-%E8%99%B9%E5%92%B2%E5%AD%A6%E5%9B%AD%E6%9C%AA%E6%9D%A5%E5%BD%A9%E8%99%B9%F0%9F%8C%88%E5%90%8C%E5%A5%BD%E4%BC%9A-brightgreen?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2844d8f57d50a8818bd70e521ca879467ebc47391698ac4216ba14c44a46be56) （推荐）
-- [![邮箱](https://img.shields.io/badge/%E9%82%AE%E7%AE%B1-qianjunakasumi%40gmail.com-brightgreen?style=flat-square)](mailto:qianjunakasumi@gmail.com)
 - [Issues](https://github.com/qianjunakasumi/project-shizuku/issues)
 
 ### 鸣谢
@@ -109,59 +110,19 @@ SHIZUKU💧（注音：`しずく`） 是一个集 获取虹咲学园相关**新
 - [robfig/cron](https://github.com/robfig/cron/) MIT 许可
 - [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql) MPL-2.0 许可
 
-## 赞助
-
-软件的开发和运行都离不开资金的帮助。若您有足够的能力，可向我们提供资金帮助  
-您的赞助将会全款用于项目的开发、维护和运行  
-赞助无任何金额限制，您可根据您的能力和喜好支持我们的工作  
-赞助的钱款流水走向实行全透明公开制度，您可提供[赞助记录]()查阅  
-
-> ### 单次赞助
-
-适用于短期和自定义金额的赞助，钱款将直接进入开发者资金账户
-
-<img width="500" src="https://s1.ax1x.com/2020/07/24/UjtX26.jpg" alt="联合支付">
-
-*不推荐微信支付：我们的服务器依托于阿里云，支付手段为支付宝付款。微信的钱款难以在短时间内被我们使用，造成资金存在而无法使用的窘境
-
-您还可以通过银行卡转账的方式向我们提供帮助，请通过 [联系方式]() 联系我
-
-> ### 订阅赞助
-
-适用于长期和固定金额的赞助，钱款将被平台收取 6% 的费用后进入开发者资金账户
-
-[爱发电](https://afdian.net/@qianjunakasumi)
-
-<img width="500" src="https://s1.ax1x.com/2020/07/24/UvRBPP.png" alt="爱发电">
-
 ## 许可
 
 > ### 版权信息
 
 **Copyright (C) 2020-present  QianjuNakasumi**
 
-SHIZUKU💧（以下简称该软件） 由 Qianjunakasumi 开发（以下简称我）。我依法拥有该软件的所有版权。  
-本着共享开放的角度，我以开放源代码的形式发布该软件。您可以在遵守以下许可证的前提下使用该软件。  
-自您使用该软件开始，您和我之间的合同关系自动成立。除非您停止使用该软件或与我有签署额外合同，  
-您须认真遵循该授权协议约定的每一条款。
-
-我的联系方式：
-
-* Twitter：qianjunakasumi
-* 邮箱：qianjunakasumi@gmail.com
-* QQ：2074466353
-
 > ### 许可证
 
-![License](https://img.shields.io/github/license/qianjunakasumi/project-shizuku?style=flat-square)
+![License](https://img.shields.io/github/license/qianjunakasumi/Project-SHIZUKU?style=flat-square)
 
 GNU Affero General Public License v3.0
 
 ```
-Copyright (C) 2020-present QianjuNakasumi
-
-E-mail qianjunakasumi@gmail.com
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
 by the Free Software Foundation, either version 3 of the License, or
@@ -173,7 +134,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see https://github.com/qianjunakasumi/project-shizuku/blob/master/LICENSE.
+along with this program.  If not, see https://github.com/qianjunakasumi/Project-SHIZUKU/blob/main/LICENSE.
 ```
 
 ## 法律法规
